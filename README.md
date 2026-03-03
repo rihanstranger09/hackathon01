@@ -68,7 +68,7 @@ Browser extension for real-time URL scanning
 Multi-language phishing awareness training modules
 Enterprise dashboards for monitoring phishing attempts
 👥 TEAM
-Smart India Hackathon 2025 – TEAM CODEHEX
+ – Code Breakers
 
 Member 1: MOHAMMED RIHAN WAHID
 Member 2: SAMYAK 
@@ -77,3 +77,4 @@ Member 4: MANISH L
 
 💡 TAGLINE
 “Real-Time AI/ML-Based Phishing Detection and Prevention System – Detect ✅ | Prevent ⚠ | Educate 💡”
+
