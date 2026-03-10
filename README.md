@@ -28,21 +28,25 @@ Confidence score (%)
 Highlight suspicious keywords
 Analysis of domain names
 Light/Dark mode toggle, color-coded result cards
-🛠️ TECH STACK
-Language: Python 3.10+
+
+🛠️ TECH STACK :-
+Languages: Frontend: HTML, json, yaml
+           Backend : Python, fastapi, motia 
 Libraries:
 streamlit, scikit-learn, pandas, numpy, plotly
 📂 PROJECT STRUCTURE
 Real-Time-AI-ML-Based-Phishing-Detection-and-Prevention-System
 
-├── app.py # Streamlit web app
-├── phishing_combined_model.pkl # Trained ML model (Logistic Regression)
-├── vectorizer_vocab.json # Lightweight TF-IDF vocabulary for deployment
+├── app.py 
+├── phishing_model.pkl # Trained ML model (Logistic Regression)
+├── vectorizer,pkl# Lightweight TF-IDF vocabulary for deployment
 ├── phishing_model_training.ipynb # Jupyter Notebook (model training & saving files)
 ├── requirements.txt # List of dependencies for Streamlit Cloud deployment
 ├── sample_safe_email.txt # Demo input file: Safe email
 ├── sample_phish_email.txt # Demo input file: Phishing email
 └── sample_suspicious_email.txt # Demo input file: Suspicious emai
+|__ sample url
+|__ sample images
 🎯 DEMO SAMPLES
 ✅ Safe Email Example
 
@@ -77,4 +81,5 @@ Member 4: MANISH L
 
 💡 TAGLINE
 “Real-Time AI/ML-Based Phishing Detection and Prevention System – Detect ✅ | Prevent ⚠ | Educate 💡”
+
 
