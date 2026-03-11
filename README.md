@@ -1,103 +1,212 @@
-🛡️ Real-Time AI/ML-Based Phishing Detection and Prevention System
-Problem Statement: Real-Time AI/ML-Based Phishing Detection and Prevention System
+# 🛡️ PhishGuard AI – Intelligent Phishing Detection System
 
+## 🚀 Overview
 
+**PhishGuard AI** is a real-time phishing detection and prevention system built during a hackathon to combat one of the most common cybersecurity threats: phishing attacks.
 
-📌 OVERVIEW:-
-Phishing attacks are one of the most common cyber threats.
-Real-time AI/ML phishing detection and prevention system built as a web application.
+Phishing attacks trick users into revealing sensitive information such as passwords, banking details, or personal data by impersonating trusted websites or services. PhishGuard AI helps prevent these attacks by analyzing suspicious URLs and screenshots using Artificial Intelligence, Machine Learning, and Optical Character Recognition (OCR).
 
-Our logistic regression model (with TF-IDF) achieves ~99% accuracy and classifies input as:
+The platform allows users to quickly check whether a link or message is potentially malicious, providing an accessible tool for improving online safety.
 
-✅ Safe
-⚠ Suspicious
-🚨 Phishing
-Unlike Gmail or VirusTotal, this system is explainable and educational: it shows keywords, risky domains, confidence scores, and provides awareness training through a quiz.
+---
 
+## ✨ Key Features
 
+### 🔍 Real-Time URL Analysis
 
-🚀 FEATURES
-AI / ML Model (scikit-learn)
+Users can submit suspicious URLs, and the system analyzes multiple features of the link to determine whether it is legitimate or phishing.
 
-Logistic Regression trained on phishing emails + URLs datasets
-Hybrid rules with trusted domains to reduce false positives
-Web App
+### 🖼️ OCR-Based Screenshot Detection
 
-🛡️ Detector: Paste text/URL or upload .txt file
-📊 Dashboard: Stats with bar chart + donut chart
-💡 Awareness Quiz: Tips + 5-question awareness quiz
-Explainable \& User-Friendly
+Users can upload screenshots of suspicious messages or websites. The system extracts text using OCR and analyzes it for phishing indicators.
 
-Confidence score (%)
-Highlight suspicious keywords
-Analysis of domain names
-Light/Dark mode toggle, color-coded result cards
+### 🤖 AI/ML-Powered Classification
 
+A trained machine learning model evaluates extracted features from URLs and classifies them as **safe** or **phishing**.
 
+### 🌐 Interactive Web Interface
 
-🛠️ TECH STACK :-
-Languages: Frontend: HTML, json, yaml
-Backend : Python, fastapi, motia
-Libraries:
-streamlit, scikit-learn, pandas, numpy, plotly
+A simple and intuitive web interface allows users to easily paste URLs or upload screenshots for quick analysis.
 
+### ⚡ Fast Backend Processing
 
+The Flask-based backend processes requests efficiently and returns predictions in real time.
 
-📂 PROJECT STRUCTURE
-Real-Time-AI-ML-Based-Phishing-Detection-and-Prevention-System
+---
 
-├── app.py
-├── phishing\_model.pkl # Trained ML model (Logistic Regression)
-├── vectorizer,pkl
-├── phishing\_model\_training.ipynb # Jupyter Notebook (model training \& saving files)
-├── requirements.txt # List of dependencies for Streamlit Cloud deployment
-├── sample\_safe\_email.txt # Demo input file: Safe email
-├── sample\_phish\_email.txt # Demo input file: Phishing email
-└── sample\_suspicious\_email.txt # Demo input file: Suspicious emai
-|\_\_ sample url
-|\_\_ sample images
+## 🏗️ Project Architecture
 
+The system follows a client-server architecture designed for speed and simplicity.
 
+**Frontend (User Interface)**
 
-🎯 DEMO SAMPLES
-✅ Safe Email Example
+* Provides a simple webpage where users can enter URLs or upload images
+* Displays phishing detection results
 
-Your Amazon order has been shipped:
+**Backend (Flask Server)**
 
-https://www.amazon.in/order
+* Receives user requests from the frontend
+* Processes URLs and uploaded images
+* Sends extracted data to the machine learning model
 
-🚨 Phishing Email Example
+**Machine Learning Model**
 
-Urgent! Your PayPal account is limited, verify here:
+* Trained using phishing and legitimate URL datasets
+* Predicts whether a URL is safe or malicious
 
-http://secure-login-paypai.com
+**OCR Engine**
 
-⚠ Suspicious Email Example
+* Extracts text from screenshots using Tesseract OCR
+* Helps identify phishing patterns in messages and webpages
 
-We detected unusual activity in your account.
+---
 
-Please review your profile details.
+## 🧰 Technology Stack
 
+### Frontend
 
+* HTML
+* CSS
+* JavaScript
 
-🚀 FUTURE SCOPE
-Gmail/Outlook integration → automatically move phishing mails to spam
-Browser extension for real-time URL scanning
-Multi-language phishing awareness training modules
-Enterprise dashboards for monitoring phishing attempts
+### Backend
 
+* Python 🐍
+* Flask
 
+### Machine Learning
 
-👥 TEAM
-– Code Breakers
+* Scikit-learn
+* Pickle (Model Serialization)
 
-Member 1: MOHAMMED RIHAN WAHID
-Member 2: SAMYAK
-Member 3: MANUKRISHNA
-Member 4: MANISH L
+### Computer Vision & OCR
 
+* OpenCV
+* Tesseract OCR
+* Pillow
 
+### Deployment
 
-💡 TAGLINE
-“Real-Time AI/ML-Based Phishing Detection and Prevention System – Detect ✅ | Prevent ⚠ | Educate 💡”
+* Render ☁️
+* GitHub (Version Control)
 
+---
+
+## 📁 Project Structure
+
+```
+phishguard-ai/
+│
+├── app.py                 # Main Flask application
+├── requirements.txt       # Python dependencies
+├── build.sh               # Deployment build script
+│
+├── templates/
+│   └── phishguard.html    # Frontend interface
+│
+├── model/
+│   └── phishing_model.pkl # Trained ML model
+│
+└── static/
+    ├── css
+    ├── js
+    └── images
+```
+
+---
+
+## ⚙️ Installation and Setup
+
+### 1️⃣ Clone the Repository
+
+```
+git clone https://github.com/yourusername/phishguard-ai.git
+cd phishguard-ai
+```
+
+### 2️⃣ Install Dependencies
+
+```
+pip install -r requirements.txt
+```
+
+### 3️⃣ Run the Application
+
+```
+python app.py
+```
+
+The application will start locally at:
+
+```
+http://127.0.0.1:5000
+```
+
+---
+
+## ☁️ Deployment (Render)
+
+The project is deployed using **Render** for cloud hosting.
+
+**Steps to deploy:**
+
+1. Push the repository to GitHub
+2. Connect the repository to Render
+3. Set the build command:
+
+```
+pip install -r requirements.txt
+```
+
+4. Set the start command:
+
+```
+gunicorn app:app
+```
+
+Once deployed, the system becomes accessible via a public URL.
+
+---
+
+## 🔮 Future Improvements
+
+* 🧩 Browser extension for real-time phishing detection
+* 📧 Email phishing detection support
+* 🧠 Deep learning models for improved accuracy
+* 🌍 Integration with cybersecurity threat intelligence APIs
+* 📊 Continuous dataset updates for better model training
+
+---
+
+## 👥 Team
+
+**Team Name:** Code Breakers
+
+Team Roles:
+
+* Frontend Developer
+* Backend Developer
+* Machine Learning Engineer
+* System Integration & Testing
+
+---
+
+## 🎯 Use Cases
+
+PhishGuard AI can be useful for:
+
+* 🧑‍🎓 Students learning cybersecurity concepts
+* 🏢 Organizations wanting lightweight phishing detection tools
+* 🔬 Security researchers experimenting with phishing detection models
+* 🌐 Everyday users verifying suspicious links before clicking
+
+---
+
+## 📜 License
+
+This project was developed for **educational and hackathon purposes**.
+Feel free to explore, modify, and improve the system for learning and research.
+
+---
+
+⭐ If you found this project interesting, consider giving it a **star on GitHub**!
