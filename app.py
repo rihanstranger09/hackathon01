@@ -14,50 +14,52 @@ if platform.system() == "Windows":
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-model = pickle.load(open(os.path.join(BASE_DIR, "phishing_model.pkl"), "rb"))
-vectorizer = pickle.load(open(os.path.join(BASE_DIR, "vectorizer.pkl"), "rb"))
+try:
+    model = pickle.load(open(os.path.join(BASE_DIR, "phishing_model.pkl"), "rb"))
+    vectorizer = pickle.load(open(os.path.join(BASE_DIR, "vectorizer.pkl"), "rb"))
+except FileNotFoundError:
+    print("Model or vectorizer file not found. Please ensure 'phishing_model.pkl' and 'vectorizer.pkl' are in the backend directory.")
+    model = None
+    vectorizer = None
 
 @app.route('/')
 def home():
     return render_template('phishguard.html')
 
-
 @app.route('/detect', methods=['POST'])
 def detect():
+    if model is None or vectorizer is None:
+        return jsonify({"error": "Model not loaded"}), 500
 
+    text = ""
     if 'file' in request.files:
-
         file = request.files['file']
-        image = Image.open(file).convert("RGB")
-
-        img = np.array(image)
-
-        if img is None or img.size == 0:
-            return jsonify({"error": "Invalid image"}), 400
-
-        gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-        thresh = cv2.threshold(gray,150,255,cv2.THRESH_BINARY)[1]
-
-        text = pytesseract.image_to_string(thresh)
-
+        try:
+            image = Image.open(file).convert("RGB")
+            img = np.array(image)
+            if img is None or img.size == 0:
+                return jsonify({"error": "Invalid image"}), 400
+            gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+            thresh = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)[1]
+            text = pytesseract.image_to_string(thresh)
+        except Exception as e:
+            return jsonify({"error": f"Error processing image: {str(e)}"}), 400
     else:
         data = request.get_json()
-
         if not data or "text" not in data:
             return jsonify({"error": "No text provided"}), 400
-
         text = data["text"]
 
-    data_vec = vectorizer.transform([text])
-    prediction = model.predict(data_vec)[0]
-
-    result = "Phishing Detected" if prediction == 1 else "Safe Email"
-
-    return jsonify({
-        "prediction": result,
-        "extracted_text": text
-    })
-
+    try:
+        data_vec = vectorizer.transform([text])
+        prediction = model.predict(data_vec)[0]
+        result = "Phishing Detected" if prediction == 1 else "Safe Email"
+        return jsonify({
+            "prediction": result,
+            "extracted_text": text
+        })
+    except Exception as e:
+        return jsonify({"error": f"Error during prediction: {str(e)}"}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
