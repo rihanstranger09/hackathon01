@@ -19,6 +19,11 @@ vectorizer_path = os.path.join(BASE_DIR, "vectorizer.pkl")
 model = pickle.load(open(model_path, "rb"))
 vectorizer = pickle.load(open(vectorizer_path, "rb"))
 
+@app.route('/')
+def home():
+    return "PhishGuard AI backend is running"
+
+
 @app.route('/detect', methods=['POST'])
 def detect():
 
