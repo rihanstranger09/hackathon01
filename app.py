@@ -4,35 +4,12 @@ import pytesseract
 import pickle
 import cv2
 import numpy as np
-
-
-# Path to your image
-image_path = "image.jpg"
-
-# Read image
-img = cv2.imread(image_path)
-
-# Convert to grayscale (improves accuracy)
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-# OCR: extract text
-text = pytesseract.image_to_string(gray)
-
-# Print extracted text
-print("Extracted Text:\n")
-print(text)
-
-# Save to txt file
-with open("output.txt", "w") as file:
-    file.write(text)
-
-print("\nText saved to output.txt")
+import os
 
 app = Flask(__name__)
 
+# Load OCR engine
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
-import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -52,6 +29,7 @@ def detect():
 
         img = np.array(image)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
         thresh = cv2.threshold(gray,150,255,cv2.THRESH_BINARY)[1]
 
         text = pytesseract.image_to_string(thresh)
@@ -71,4 +49,5 @@ def detect():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
