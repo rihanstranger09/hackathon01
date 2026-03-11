@@ -1,0 +1,3585 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<!-- ============================================================
+     PhishGuard AI — Intelligent Phishing Detection
+     Team: Code Breakers
+     ============================================================ -->
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhishGuard AI — Intelligent Phishing Detection</title>
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+
+  <style>
+    /* ==============================================================
+       CSS TABLE OF CONTENTS
+       1.  CSS Custom Properties (Design Tokens)
+       2.  Reset & Base Styles
+       3.  Scrollbar
+       4.  Canvas & Grid Background
+       5.  Custom Cursor
+       6.  Navigation
+       7.  Section Shared Styles
+       8.  Hero Section
+       9.  Terminal Animation
+       10. Scan Overlay
+       11. Analyze Section (Input + Verdict)
+       12. Gauge Widget
+       13. Red Flags Section
+       14. Dashboard Section
+       15. Education Section
+       16. History / Audit Trail
+       17. Security Score
+       18. Toast Notification
+       19. Chatbot
+       20. Footer
+       21. Scroll Reveal Animation
+       22. Responsive Breakpoints
+       ============================================================== */
+
+
+    /* ── 1. CSS CUSTOM PROPERTIES ─────────────────────────────────── */
+    :root {
+      /* Backgrounds */
+      --bg:  #040b17;
+      --bg2: #071020;
+      --bg3: #0c1a30;
+
+      /* Surface layers */
+      --s1: rgba(255, 255, 255, .03);
+      --s2: rgba(255, 255, 255, .06);
+      --s3: rgba(255, 255, 255, .1);
+
+      /* Borders */
+      --br:  rgba(255, 255, 255, .07);
+      --brb: rgba(255, 255, 255, .13);
+
+      /* Brand colors */
+      --blue: #1e3a8a;
+      --blm:  #2563eb;
+      --bll:  #3b82f6;
+
+      /* Semantic colors */
+      --grn: #22c55e;
+      --gd:  rgba(34, 197, 94, .12);
+      --gg:  rgba(34, 197, 94, .3);
+      --red: #ef4444;
+      --rd:  rgba(239, 68, 68, .12);
+      --rg:  rgba(239, 68, 68, .3);
+      --amb: #f59e0b;
+      --pur: #a855f7;
+      --cyn: #06b6d4;
+
+      /* Text */
+      --tx:  #f1f5f9;
+      --tx2: #94a3b8;
+      --tx3: #475569;
+
+      /* Radii */
+      --r:  16px;
+      --rs: 10px;
+
+      /* Typography */
+      --fd: 'Syne', sans-serif;
+      --fb: 'DM Sans', sans-serif;
+      --fm: 'JetBrains Mono', monospace;
+
+      /* Easing curves */
+      --esp: cubic-bezier(.34, 1.56, .64, 1);
+      --eo:  cubic-bezier(.16, 1, .3, 1);
+    }
+
+    /* Light theme overrides */
+    [data-theme="light"] {
+      --bg:  #eef3fc;
+      --bg2: #e4ecf9;
+      --bg3: #dae5f7;
+      --s1:  rgba(255, 255, 255, .7);
+      --s2:  rgba(255, 255, 255, .88);
+      --s3:  #fff;
+      --br:  rgba(0, 0, 0, .07);
+      --brb: rgba(0, 0, 0, .12);
+      --tx:  #0f172a;
+      --tx2: #334155;
+      --tx3: #64748b;
+    }
+
+
+    /* ── 2. RESET & BASE STYLES ───────────────────────────────────── */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--fb);
+      background: var(--bg);
+      color: var(--tx);
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    ::selection {
+      background: rgba(34, 197, 94, .25);
+      color: var(--grn);
+    }
+
+
+    /* ── 3. SCROLLBAR ─────────────────────────────────────────────── */
+    ::-webkit-scrollbar       { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(var(--bll), var(--grn));
+      border-radius: 3px;
+    }
+
+
+    /* ── 4. CANVAS & GRID BACKGROUND ─────────────────────────────── */
+    #canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: .55;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(59, 130, 246, .022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59, 130, 246, .022) 1px, transparent 1px);
+      background-size: 50px 50px;
+      mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+    }
+
+
+    /* ── 5. CUSTOM CURSOR ─────────────────────────────────────────── */
+    #cdot {
+      width: 8px;
+      height: 8px;
+      background: rgba(255, 255, 255, .9);
+      border-radius: 50%;
+      position: fixed;
+      transform: translate(-50%, -50%);
+      z-index: 9999;
+      pointer-events: none;
+      mix-blend-mode: difference;
+      transition: width .15s, height .15s;
+    }
+
+    #cring {
+      width: 34px;
+      height: 34px;
+      border: 1.5px solid rgba(255, 255, 255, .3);
+      border-radius: 50%;
+      position: fixed;
+      transform: translate(-50%, -50%);
+      z-index: 9998;
+      pointer-events: none;
+      transition: width .3s, height .3s, border-color .3s;
+    }
+
+
+    /* ── 6. NAVIGATION ────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 66px;
+      background: rgba(4, 11, 23, .85);
+      backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--br);
+      animation: navslide .6s var(--eo) both;
+    }
+
+    [data-theme="light"] nav {
+      background: rgba(238, 243, 252, .88);
+    }
+
+    @keyframes navslide {
+      from { transform: translateY(-100%); opacity: 0; }
+      to   { transform: translateY(0);     opacity: 1; }
+    }
+
+    /* Logo */
+    .nlogo {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+    }
+
+    .nshield {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, #1e3a8a, #22c55e);
+      display: grid;
+      place-items: center;
+      font-size: 19px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(34, 197, 94, .4), 0 0 40px rgba(34, 197, 94, .12);
+      animation: shpulse 3s ease-in-out infinite;
+    }
+
+    @keyframes shpulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(34, 197, 94, .4), 0 0 40px rgba(34, 197, 94, .12); }
+      50%       { box-shadow: 0 0 32px rgba(34, 197, 94, .6), 0 0 60px rgba(34, 197, 94, .22); }
+    }
+
+    .nword {
+      font-family: var(--fd);
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -.01em;
+    }
+
+    .nword b { color: var(--grn); }
+
+    /* Nav links */
+    .nlinks {
+      display: flex;
+      gap: 2px;
+      list-style: none;
+    }
+
+    .nlinks a {
+      padding: 8px 14px;
+      border-radius: 9px;
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--tx2);
+      text-decoration: none;
+      transition: all .22s;
+      position: relative;
+    }
+
+    .nlinks a::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 2px;
+      background: var(--grn);
+      border-radius: 2px;
+      transition: width .3s var(--eo);
+    }
+
+    .nlinks a:hover,
+    .nlinks a.active { color: var(--tx); }
+
+    .nlinks a.active::after,
+    .nlinks a:hover::after { width: 55%; }
+
+    /* Nav actions */
+    .nacts {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .thbtn {
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      background: var(--s2);
+      border: 1px solid var(--br);
+      color: var(--tx2);
+      cursor: none;
+      font-size: 17px;
+      display: grid;
+      place-items: center;
+      transition: all .3s var(--esp);
+    }
+
+    .thbtn:hover {
+      transform: scale(1.15) rotate(20deg);
+      border-color: var(--grn);
+      color: var(--grn);
+    }
+
+    .navpill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px 6px 8px;
+      border-radius: 100px;
+      background: var(--s2);
+      border: 1px solid var(--br);
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--tx2);
+      cursor: none;
+      transition: all .25s;
+    }
+
+    .navpill:hover {
+      border-color: var(--grn);
+      color: var(--grn);
+    }
+
+    .navatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--bll), var(--pur));
+      display: grid;
+      place-items: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+
+    /* ── 7. SECTION SHARED STYLES ─────────────────────────────────── */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 88px 48px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--grn);
+      margin-bottom: 10px;
+    }
+
+    .eyebrow::before,
+    .eyebrow::after {
+      content: '';
+      width: 22px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--grn));
+      opacity: .5;
+    }
+
+    .stitle {
+      font-family: var(--fd);
+      font-weight: 800;
+      font-size: clamp(1.55rem, 2.8vw, 2rem);
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+
+    .ssub {
+      color: var(--tx2);
+      font-size: .92rem;
+      line-height: 1.68;
+      max-width: 580px;
+    }
+
+    /* Shared button styles */
+    .btn {
+      padding: 13px 26px;
+      border-radius: 12px;
+      font-family: var(--fb);
+      font-weight: 600;
+      font-size: .88rem;
+      cursor: none;
+      border: none;
+      transition: all .3s var(--esp);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(255, 255, 255, .12), transparent);
+      opacity: 0;
+      transition: opacity .2s;
+    }
+
+    .btn:hover::after { opacity: 1; }
+
+    .btnp {
+      background: linear-gradient(135deg, #16a34a, #22c55e, #16a34a);
+      background-size: 200% auto;
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(34, 197, 94, .35), 0 1px 0 rgba(255, 255, 255, .1) inset;
+    }
+
+    .btnp:hover {
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 12px 36px rgba(34, 197, 94, .5);
+      background-position: right;
+    }
+
+    .btnp:active { transform: translateY(-1px) scale(.99); }
+
+    .btng {
+      background: var(--s2);
+      color: var(--tx);
+      border: 1px solid var(--br);
+    }
+
+    .btng:hover {
+      border-color: var(--bll);
+      background: rgba(59, 130, 246, .08);
+      transform: translateY(-2px);
+    }
+
+    .bsm {
+      padding: 9px 18px;
+      font-size: .82rem;
+    }
+
+    .btnr {
+      background: rgba(239, 68, 68, .1);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, .2);
+    }
+
+    .btnr:hover {
+      background: rgba(239, 68, 68, .2);
+      transform: translateY(-2px);
+    }
+
+    .btnb {
+      background: rgba(59, 130, 246, .1);
+      color: var(--bll);
+      border: 1px solid rgba(59, 130, 246, .2);
+    }
+
+    .btnb:hover {
+      background: rgba(59, 130, 246, .2);
+      transform: translateY(-2px);
+    }
+
+
+    /* ── 8. HERO SECTION ──────────────────────────────────────────── */
+    #home {
+      min-height: calc(100vh - 66px);
+      display: flex;
+      align-items: center;
+      padding: 80px 48px;
+      overflow: hidden;
+    }
+
+    .hlayout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Badge */
+    .hbadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 100px;
+      background: rgba(34, 197, 94, .08);
+      border: 1px solid rgba(34, 197, 94, .2);
+      font-size: .73rem;
+      font-weight: 700;
+      color: var(--grn);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 28px;
+      animation: popIn .7s var(--esp) .3s both;
+    }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(.7) translateY(8px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .ldot {
+      width: 7px;
+      height: 7px;
+      background: var(--grn);
+      border-radius: 50%;
+      animation: livepulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes livepulse {
+      0%   { transform: scale(1);   box-shadow: 0 0 0 0   rgba(34, 197, 94, .7); }
+      70%  { transform: scale(1.2); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+      100% { transform: scale(1);   box-shadow: 0 0 0 0   rgba(34, 197, 94, 0); }
+    }
+
+    /* Heading */
+    .htitle {
+      font-family: var(--fd);
+      font-weight: 800;
+      font-size: clamp(2.7rem, 5.5vw, 4.1rem);
+      line-height: 1.02;
+      margin-bottom: 22px;
+      animation: slideUp .9s var(--eo) .4s both;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(44px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hl {
+      background: linear-gradient(90deg, var(--grn), var(--cyn), var(--bll), var(--grn));
+      background-size: 300% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradShift 5s linear infinite;
+    }
+
+    @keyframes gradShift {
+      to { background-position: 300% center; }
+    }
+
+    /* Description */
+    .hdesc {
+      font-size: 1.02rem;
+      color: var(--tx2);
+      line-height: 1.72;
+      max-width: 510px;
+      margin-bottom: 38px;
+      animation: slideUp .9s var(--eo) .55s both;
+    }
+
+    /* CTA buttons row */
+    .hbtns {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      animation: slideUp .9s var(--eo) .7s both;
+    }
+
+    /* Stats bar */
+    .hstats {
+      display: flex;
+      gap: 40px;
+      margin-top: 52px;
+      padding-top: 36px;
+      border-top: 1px solid var(--br);
+      animation: slideUp .9s var(--eo) .85s both;
+    }
+
+    .snum {
+      font-family: var(--fd);
+      font-weight: 800;
+      font-size: 2rem;
+      color: var(--grn);
+      line-height: 1;
+    }
+
+    .slabel {
+      font-size: .73rem;
+      color: var(--tx3);
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+
+    /* ── 9. TERMINAL ANIMATION ────────────────────────────────────── */
+    .hvisual {
+      animation: slideUp .9s var(--eo) .5s both;
+      perspective: 1400px;
+    }
+
+    .term {
+      background: rgba(4, 10, 20, .94);
+      border: 1px solid rgba(34, 197, 94, .2);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 28px 80px rgba(0, 0, 0, .6), 0 0 80px rgba(34, 197, 94, .05);
+      animation: termfloat 7s ease-in-out infinite;
+      transform-style: preserve-3d;
+    }
+
+    @keyframes termfloat {
+      0%, 100% { transform: rotateY(-3deg) rotateX(2deg); }
+      50%       { transform: rotateY(-5deg) rotateX(4deg) translateY(-14px); }
+    }
+
+    .tbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 18px;
+      background: rgba(255, 255, 255, .035);
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+    }
+
+    .tdot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+
+    .ttitle {
+      font-family: var(--fm);
+      font-size: .75rem;
+      color: var(--tx3);
+      margin: 0 auto;
+    }
+
+    .tbody {
+      padding: 20px;
+      font-family: var(--fm);
+      font-size: .8rem;
+      line-height: 2;
+      min-height: 300px;
+    }
+
+    .tline {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      opacity: 0;
+      animation: tlfade .4s ease forwards;
+    }
+
+    @keyframes tlfade { to { opacity: 1; } }
+
+    .tp { color: var(--grn); flex-shrink: 0; }
+    .tc { color: var(--cyn); }
+    .to { color: var(--tx2); padding-left: 20px; }
+    .to.warn { color: var(--amb); }
+    .to.err  { color: var(--red); }
+    .to.ok   { color: var(--grn); }
+    .to.info { color: var(--bll); }
+
+    .tcursor {
+      display: inline-block;
+      width: 8px;
+      height: 14px;
+      background: var(--grn);
+      animation: blink 1s step-end infinite;
+      vertical-align: text-bottom;
+    }
+
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .tpbar {
+      margin: 4px 0 4px 20px;
+      height: 5px;
+      background: rgba(255, 255, 255, .07);
+      border-radius: 3px;
+      overflow: hidden;
+      width: 220px;
+    }
+
+    .tpfill {
+      height: 100%;
+      border-radius: 3px;
+      animation: pbfill 1.2s var(--eo) forwards;
+    }
+
+    @keyframes pbfill { from { width: 0; } }
+
+    .talert {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      margin: 8px 0;
+      background: rgba(239, 68, 68, .1);
+      border: 1px solid rgba(239, 68, 68, .22);
+      border-radius: 9px;
+      animation: alertpop .5s var(--esp);
+    }
+
+    @keyframes alertpop {
+      from { opacity: 0; transform: scale(.88) translateY(6px); }
+      to   { opacity: 1; transform: scale(1)   translateY(0); }
+    }
+
+
+    /* ── 10. SCAN OVERLAY ─────────────────────────────────────────── */
+    #scanOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 600;
+      background: rgba(4, 11, 23, .96);
+      backdrop-filter: blur(20px) saturate(120%);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+    }
+
+    #scanOverlay.active {
+      display: flex;
+      animation: fio .4s ease both;
+    }
+
+    @keyframes fio {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* Hexagon rings */
+    .hexring {
+      width: 160px;
+      height: 160px;
+      position: relative;
+      margin-bottom: 36px;
+      flex-shrink: 0;
+    }
+
+    .hexo {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      animation: hexspin 3s linear infinite;
+    }
+
+    .hexi {
+      width: 70%;
+      height: 70%;
+      position: absolute;
+      top: 15%;
+      left: 15%;
+      animation: hexspin 2s linear infinite reverse;
+    }
+
+    @keyframes hexspin { to { transform: rotate(360deg); } }
+
+    .hexcenter {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 48px;
+      animation: hexpop 1s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 12px rgba(34, 197, 94, .6));
+    }
+
+    @keyframes hexpop {
+      from { transform: translate(-50%, -50%) scale(.9); }
+      to   { transform: translate(-50%, -50%) scale(1.08); }
+    }
+
+    /* Scan text */
+    .scantitle {
+      font-family: var(--fd);
+      font-weight: 800;
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .scansub {
+      font-size: .88rem;
+      color: var(--tx2);
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    /* Progress bar */
+    .spwrap { width: 320px; margin-bottom: 28px; }
+
+    .sptrack {
+      height: 4px;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .spfill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--bll), var(--grn));
+      border-radius: 4px;
+      width: 0%;
+      transition: width .4s var(--eo);
+      box-shadow: 0 0 12px var(--grn);
+    }
+
+    .splabel {
+      display: flex;
+      justify-content: space-between;
+      font-size: .72rem;
+      color: var(--tx3);
+      font-family: var(--fm);
+      margin-top: 8px;
+    }
+
+    /* Step grid */
+    .ssteps {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      width: 440px;
+    }
+
+    .sstep {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 16px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .03);
+      border: 1px solid var(--br);
+      font-size: .82rem;
+      color: var(--tx3);
+      transition: all .4s var(--eo);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sstep::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 3px 0 0 3px;
+      background: var(--grn);
+      transform: scaleY(0);
+      transform-origin: bottom;
+      transition: transform .4s var(--eo);
+    }
+
+    .sstep.done {
+      background: rgba(34, 197, 94, .08);
+      border-color: rgba(34, 197, 94, .22);
+      color: var(--grn);
+    }
+
+    .sstep.done::before { transform: scaleY(1); }
+
+    .sstep.active {
+      background: rgba(59, 130, 246, .08);
+      border-color: rgba(59, 130, 246, .22);
+      color: var(--bll);
+      animation: actpulse 1.2s ease-in-out infinite;
+    }
+
+    .sstep.active::before {
+      background: var(--bll);
+      transform: scaleY(1);
+    }
+
+    @keyframes actpulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .7; }
+    }
+
+    .sstep-i { font-size: 16px; flex-shrink: 0; }
+    .sstep-t { font-weight: 500; }
+    .sstep-c { margin-left: auto; font-size: 13px; }
+
+    /* Matrix rain */
+    .matline {
+      position: absolute;
+      font-family: var(--fm);
+      font-size: 11px;
+      color: rgba(34, 197, 94, .18);
+      animation: matfall linear infinite;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+      letter-spacing: 2px;
+    }
+
+    @keyframes matfall {
+      from { transform: translateY(-100%); opacity: 1; }
+      to   { transform: translateY(100vh); opacity: 0; }
+    }
+
+
+    /* ── 11. ANALYZE SECTION ──────────────────────────────────────── */
+    .sgrid {
+      display: grid;
+      grid-template-columns: 1fr 390px;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Glass card */
+    .gcard {
+      background: var(--s1);
+      border: 1px solid var(--br);
+      border-radius: var(--r);
+      padding: 28px;
+      backdrop-filter: blur(16px);
+      transition: border-color .3s, box-shadow .3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gcard::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(59, 130, 246, .03), transparent 60%);
+      pointer-events: none;
+    }
+
+    .gcard:focus-within {
+      border-color: rgba(59, 130, 246, .28);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, .06);
+    }
+
+    .ilabel {
+      font-family: var(--fd);
+      font-weight: 700;
+      font-size: .95rem;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .isub {
+      font-size: .82rem;
+      color: var(--tx2);
+      margin-bottom: 16px;
+    }
+
+    /* Textarea with spinning border animation */
+    .twrap {
+      position: relative;
+      border-radius: var(--rs);
+    }
+
+    @property --angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    .twrap::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: calc(var(--rs) + 1px);
+      background: conic-gradient(
+        from var(--angle),
+        transparent 60%,
+        rgba(34, 197, 94, .5) 75%,
+        rgba(59, 130, 246, .5) 85%,
+        transparent 100%
+      );
+      z-index: 0;
+      opacity: 0;
+      transition: opacity .4s;
+      animation: spinangle 3s linear infinite paused;
+    }
+
+    .twrap:focus-within::before {
+      opacity: 1;
+      animation-play-state: running;
+    }
+
+    @keyframes spinangle { to { --angle: 360deg; } }
+
+    textarea {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      min-height: 190px;
+      resize: vertical;
+      background: rgba(0, 0, 0, .3);
+      border: 1px solid var(--br);
+      border-radius: var(--rs);
+      color: var(--tx);
+      font-family: var(--fm);
+      font-size: .82rem;
+      line-height: 1.65;
+      padding: 14px 16px;
+      outline: none;
+      transition: border-color .2s, background .2s;
+    }
+
+    [data-theme="light"] textarea { background: rgba(255, 255, 255, .55); }
+
+    textarea:focus      { border-color: transparent; background: rgba(0, 0, 0, .4); }
+    textarea::placeholder { color: var(--tx3); }
+
+    .ccount {
+      text-align: right;
+      font-size: .72rem;
+      color: var(--tx3);
+      margin-top: 5px;
+      font-family: var(--fm);
+    }
+
+    .ccount.warn { color: var(--amb); }
+
+    /* Button row */
+    .brow {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Drag & drop zone */
+    .dz {
+      margin-top: 14px;
+      border: 2px dashed var(--brb);
+      border-radius: var(--rs);
+      padding: 22px;
+      text-align: center;
+      cursor: none;
+      transition: all .3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dz::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      background: radial-gradient(ellipse at center, rgba(59, 130, 246, .08), transparent 70%);
+      transition: opacity .3s;
+    }
+
+    .dz:hover,
+    .dz.over {
+      border-color: var(--bll);
+      border-style: solid;
+    }
+
+    .dz:hover::before,
+    .dz.over::before { opacity: 1; }
+
+    .dzicon {
+      font-size: 26px;
+      margin-bottom: 6px;
+      display: block;
+      transition: transform .3s var(--esp);
+    }
+
+    .dz:hover .dzicon { transform: translateY(-6px) scale(1.1); }
+
+    .dztxt { font-size: .82rem; color: var(--tx2); }
+    .dztxt b { color: var(--bll); }
+
+    /* Verdict card */
+    .rpanel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .vcard {
+      border-radius: var(--r);
+      padding: 26px;
+      border: 1px solid;
+      position: relative;
+      overflow: hidden;
+      animation: verdpop .7s var(--esp) both;
+    }
+
+    @keyframes verdpop {
+      from { opacity: 0; transform: scale(.88) translateY(24px); }
+      to   { opacity: 1; transform: scale(1)   translateY(0); }
+    }
+
+    .vcard::after {
+      content: '';
+      position: absolute;
+      top: -60px;
+      right: -60px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      opacity: .1;
+      animation: orbanim 4s ease-in-out infinite;
+    }
+
+    @keyframes orbanim {
+      0%, 100% { transform: scale(1); }
+      50%       { transform: scale(1.25); }
+    }
+
+    .vsafe  { background: linear-gradient(135deg, rgba(34, 197, 94, .07), rgba(6, 182, 212, .04));  border-color: rgba(34, 197, 94, .25); }
+    .vphish { background: linear-gradient(135deg, rgba(239, 68, 68, .08), rgba(168, 85, 247, .04)); border-color: rgba(239, 68, 68, .25); }
+    .vempty { background: var(--s1); border-color: var(--br); }
+
+    .vsafe::after  { background: var(--grn); }
+    .vphish::after { background: var(--red); }
+
+    .vhead {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .vicon {
+      font-size: 32px;
+      animation: iconbounce .6s var(--esp) .3s both;
+    }
+
+    @keyframes iconbounce {
+      from { opacity: 0; transform: scale(.4); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .vbadge {
+      padding: 5px 13px;
+      border-radius: 100px;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      animation: badgepop .5s var(--esp) .4s both;
+    }
+
+    @keyframes badgepop {
+      from { opacity: 0; transform: scale(.7); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    .vbs { background: rgba(34, 197, 94, .12); color: var(--grn); border: 1px solid rgba(34, 197, 94, .25); }
+    .vbp { background: rgba(239, 68, 68, .12); color: var(--red); border: 1px solid rgba(239, 68, 68, .25); }
+    .vbn { background: var(--s2); color: var(--tx2); border: 1px solid var(--br); }
+
+    .vnum {
+      font-family: var(--fd);
+      font-weight: 800;
+      font-size: 2.4rem;
+      line-height: 1;
+      margin-bottom: 4px;
+      animation: numup .8s var(--eo) .2s both;
+    }
+
+    @keyframes numup {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .vnumsafe  { color: var(--grn); }
+    .vnumphish { color: var(--red); }
+    .vlabel { font-size: .8rem; color: var(--tx2); }
+
+    .vbar-wrap { margin-top: 18px; }
+
+    .vbar-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: .78rem;
+      color: var(--tx2);
+      margin-bottom: 8px;
+    }
+
+    .vbar-track {
+      height: 10px;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .vbar-fill {
+      height: 100%;
+      border-radius: 10px;
+      width: 0;
+      transition: width 1.2s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .vbar-safe  { background: linear-gradient(90deg, #16a34a, #22c55e); box-shadow: 0 0 12px rgba(34, 197, 94, .4); }
+    .vbar-phish { background: linear-gradient(90deg, #b91c1c, #ef4444); box-shadow: 0 0 12px rgba(239, 68, 68, .4); }
+
+    .vexplain {
+      margin-top: 16px;
+      font-size: .83rem;
+      color: var(--tx2);
+      line-height: 1.65;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, .03);
+      border-radius: 8px;
+      border-left: 3px solid;
+    }
+
+    .vexplain.safe  { border-left-color: var(--grn); }
+    .vexplain.phish { border-left-color: var(--red); }
+
+
+    /* ── 12. GAUGE WIDGET ─────────────────────────────────────────── */
+    .gcardgauge {
+      background: var(--s1);
+      border: 1px solid var(--br);
+      border-radius: var(--r);
+      padding: 26px;
+      backdrop-filter: blur(16px);
+      text-align: center;
+    }
+
+    .gtitle {
+      font-family: var(--fd);
+      font-weight: 700;
+      margin-bottom: 18px;
+      font-size: .95rem;
+    }
+
+    .gsvgwrap {
+      position: relative;
+      width: 180px;
+      height: 100px;
+      margin: 0 auto 12px;
+    }
+
+    .gsvg { width: 180px; height: 100px; }
+
+    .garctk {
+      fill: none;
+      stroke: rgba(255, 255, 255, .07);
+      stroke-width: 14;
+      stroke-linecap: round;
+    }
+
+    .garcf {
+      fill: none;
+      stroke-width: 14;
+      stroke-linecap: round;
+      stroke-dasharray: 282;
+      stroke-dashoffset: 282;
+      transition: stroke-dashoffset 1.4s cubic-bezier(.16, 1, .3, 1), stroke .5s;
+    }
+
+    .gval {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--fd);
+      font-weight: 800;
+      font-size: 2rem;
+      line-height: 1;
+      white-space: nowrap;
+      transition: color .5s;
+    }
+
+    .gsub {
+      font-size: .75rem;
+      color: var(--tx3);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-top: 2px;
+    }
+
+    .gpills {
+      display: flex;
+      justify-content: center;
+      gap: 7px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .gpill {
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: .7rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+
+    .gpl { background: rgba(34, 197, 94, .08);  color: var(--grn); border-color: rgba(34, 197, 94, .25); }
+    .gpm { background: rgba(245, 158, 11, .08); color: var(--amb); border-color: rgba(245, 158, 11, .25); }
+    .gph { background: rgba(239, 68, 68, .08);  color: var(--red); border-color: rgba(239, 68, 68, .25); }
+
+
+    /* ── 13. RED FLAGS SECTION ────────────────────────────────────── */
+    .fgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 14px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .fcard {
+      background: var(--s1);
+      border: 1px solid var(--br);
+      border-radius: var(--rs);
+      padding: 18px;
+      display: flex;
+      gap: 14px;
+      transition: all .3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fcard::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--br);
+      transition: background .3s;
+    }
+
+    .fcard:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, .2);
+    }
+
+    .fcard.hit {
+      border-color: rgba(239, 68, 68, .3);
+      background: rgba(239, 68, 68, .05);
+      animation: flaghit .6s var(--esp);
+    }
+
+    .fcard.hit::before { background: var(--red); }
+
+    @keyframes flaghit {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    .ficowrap {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, .05);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      transition: all .3s;
+    }
+
+    .fcard.hit .ficowrap {
+      background: rgba(239, 68, 68, .15);
+      box-shadow: 0 0 16px rgba(239, 68, 68, .2);
+    }
+
+    .ftitle { font-weight: 600; font-size: .88rem; margin-bottom: 4px; }
+    .fdesc  { font-size: .78rem; color: var(--tx2); line-height: 1.55; }
+
+    .fbadge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 8px;
+      padding: 3px 9px;
+      border-radius: 100px;
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .fbhit { background: rgba(239, 68, 68, .12); color: var(--red); border: 1px solid rgba(239, 68, 68, .25); }
+    .fbok  { background: rgba(100, 116, 139, .1); color: var(--tx3); border: 1px solid var(--br); }
+
+    .fkws {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .fkw {
+      padding: 2px 7px;
+      background: rgba(239, 68, 68, .1);
+      border: 1px solid rgba(239, 68, 68, .2);
+      border-radius: 4px;
+      font-size: .68rem;
+      color: var(--red);
+      font-family: var(--fm);
+    }
+
+
+    /* ── 14. DASHBOARD SECTION ────────────────────────────────────── */
+    .cgrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 22px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .ccrd {
+      background: var(--s1);
+      border: 1px solid var(--br);
+      border-radius: var(--r);
+      padding: 24px;
+      backdrop-filter: blur(10px);
+      transition: border-color .3s;
+    }
+
+    .ccrd:hover { border-color: var(--brb); }
+    .ccrd.wide  { grid-column: span 2; }
+
+    .ctitle {
+      font-family: var(--fd);
+      font-weight: 700;
+      font-size: .95rem;
+      margin-bottom: 3px;
+    }
+
+    .csub {
+      font-size: .75rem;
+      color: var(--tx3);
+      margin-bottom: 18px;
+    }
+
+    .chwrap { position: relative; height: 200px; }
+
+
+    /* ── 15. EDUCATION SECTION ────────────────────────────────────── */
+    .egrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .ecard {
+      background: var(--s1);
+      border: 1px solid var(--br);
+      border-radius: var(--r);
+      padding: 26px;
+      transition: all .35s;
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+    }
+
+    .ecard::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(59, 130, 246, .04), rgba(34, 197, 94, .04));
+      opacity: 0;
+      transition: opacity .3s;
+    }
+
+    .ecard:hover {
+      border-color: rgba(59, 130, 246, .3);
+      transform: translateY(-6px);
+      box-shadow: 0 16px 48px rgba(0, 0, 0, .2);
+    }
+
+    .ecard:hover::before    { opacity: 1; }
+    .ecard:hover .eico      { transform: scale(1.1) rotate(-5deg); }
+
+    .eico {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, .15), rgba(34, 197, 94, .15));
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      margin-bottom: 18px;
+      transition: transform .3s var(--esp);
+    }
+
+    .etitle { font-family: var(--fd); font-weight: 700; margin-bottom: 8px; }
+
+    .edesc {
+      font-size: .83rem;
+      color: var(--tx2);
+      line-height: 1.62;
+      margin-bottom: 18px;
+    }
+
+    .elearn {
+      background: none;
+      border: none;
+      cursor: none;
+      color: var(--bll);
+      font-size: .83rem;
+      font-weight: 600;
+      font-family: var(--fb);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0;
+      transition: gap .25s, color .2s;
+    }
+
+    .elearn:hover { gap: 11px; color: var(--grn); }
+
+    .etag {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 100px;
+      font-size: .68rem;
+      font-weight: 600;
+      background: rgba(59, 130, 246, .1);
+      color: var(--bll);
+      border: 1px solid rgba(59, 130, 246, .2);
+      margin-bottom: 10px;
+    }
+
+
+    /* ── 16. HISTORY / AUDIT TRAIL ────────────────────────────────── */
+    .hctrl {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 1200px;
+      margin: 0 auto 20px;
+      flex-wrap: wrap;
+    }
+
+    .sinp {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 16px;
+      border-radius: var(--rs);
+      background: var(--s2);
+      border: 1px solid var(--br);
+      color: var(--tx);
+      font-size: .875rem;
+      outline: none;
+      font-family: var(--fb);
+      transition: border-color .2s;
+    }
+
+    .sinp:focus { border-color: var(--bll); }
+
+    .twrp {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--s1);
+      border: 1px solid var(--br);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead { background: rgba(255, 255, 255, .035); }
+
+    th {
+      padding: 13px 18px;
+      text-align: left;
+      font-size: .72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--tx3);
+    }
+
+    td {
+      padding: 13px 18px;
+      font-size: .85rem;
+      border-top: 1px solid var(--br);
+      transition: background .2s;
+    }
+
+    tr:hover td { background: rgba(255, 255, 255, .025); }
+
+    .tdm {
+      max-width: 280px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: var(--fm);
+      font-size: .76rem;
+      color: var(--tx2);
+    }
+
+    .ibt {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--s2);
+      border: 1px solid var(--br);
+      cursor: none;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      transition: all .2s;
+    }
+
+    .ibt:hover          { border-color: var(--bll); }
+    .ibt.del:hover      { border-color: var(--red); background: var(--rd); }
+
+
+    /* ── 17. SECURITY SCORE ───────────────────────────────────────── */
+    .slayout {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 52px;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .bgsvgwrap { position: relative; width: 220px; height: 120px; }
+    .bgsvg     { width: 220px; height: 120px; }
+
+    .bgtrack {
+      fill: none;
+      stroke: rgba(255, 255, 255, .06);
+      stroke-width: 16;
+      stroke-linecap: round;
+    }
+
+    .bgfill {
+      fill: none;
+      stroke: var(--amb);
+      stroke-width: 16;
+      stroke-linecap: round;
+      stroke-dasharray: 345;
+      stroke-dashoffset: 345;
+      transition: stroke-dashoffset 1.6s cubic-bezier(.16, 1, .3, 1);
+    }
+
+    .bgval {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--fd);
+      font-weight: 800;
+      font-size: 2.4rem;
+      color: var(--amb);
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .bgsubl {
+      font-size: .72rem;
+      color: var(--tx3);
+      text-align: center;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .sdets { display: flex; flex-direction: column; gap: 16px; }
+
+    .sitem .sih {
+      display: flex;
+      justify-content: space-between;
+      font-size: .85rem;
+      margin-bottom: 7px;
+    }
+
+    .sibar {
+      height: 7px;
+      background: rgba(255, 255, 255, .06);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .sibf {
+      height: 100%;
+      border-radius: 10px;
+      width: 0;
+      transition: width 1.2s var(--eo);
+    }
+
+
+    /* ── 18. TOAST NOTIFICATION ───────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      background: var(--bg3);
+      border: 1px solid var(--brb);
+      border-radius: var(--r);
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, .35);
+      max-width: 320px;
+      transform: translateX(calc(100% + 32px));
+      transition: transform .4s var(--esp);
+    }
+
+    .toast.show { transform: translateX(0); }
+
+    .toast-i { font-size: 20px; }
+    .toast-t { font-size: .83rem; font-weight: 500; }
+
+
+    /* ── 19. CHATBOT ──────────────────────────────────────────────── */
+    .cfab {
+      position: fixed;
+      bottom: 28px;
+      left: 28px;
+      z-index: 500;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--bll));
+      border: none;
+      cursor: none;
+      font-size: 22px;
+      box-shadow: 0 4px 24px rgba(59, 130, 246, .45);
+      transition: all .3s var(--esp);
+      display: grid;
+      place-items: center;
+    }
+
+    .cfab:hover {
+      transform: scale(1.12);
+      box-shadow: 0 8px 36px rgba(59, 130, 246, .6);
+    }
+
+    .cfab.notif::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--red);
+      border: 2px solid var(--bg);
+      animation: livepulse 1.5s infinite;
+    }
+
+    /* Chat window */
+    .cbox {
+      position: fixed;
+      bottom: 92px;
+      left: 28px;
+      z-index: 500;
+      width: 316px;
+      height: 430px;
+      background: var(--bg2);
+      border: 1px solid var(--brb);
+      border-radius: var(--r);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: scale(.8) translateY(16px);
+      opacity: 0;
+      pointer-events: none;
+      transform-origin: bottom left;
+      transition: all .35s var(--esp);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, .45);
+    }
+
+    .cbox.open {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .chead {
+      padding: 15px 18px;
+      background: linear-gradient(135deg, var(--blue), var(--bll));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cheadtitle {
+      font-family: var(--fd);
+      font-weight: 700;
+      font-size: .92rem;
+      color: #fff;
+    }
+
+    .ccls {
+      background: none;
+      border: none;
+      cursor: none;
+      font-size: 17px;
+      color: rgba(255, 255, 255, .7);
+      line-height: 1;
+      transition: color .2s;
+    }
+
+    .ccls:hover { color: #fff; }
+
+    .cbody {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Message bubbles */
+    .cm {
+      max-width: 86%;
+      padding: 10px 13px;
+      border-radius: 12px;
+      font-size: .81rem;
+      line-height: 1.55;
+      animation: cmin .3s var(--esp);
+    }
+
+    @keyframes cmin {
+      from { opacity: 0; transform: scale(.85) translateY(6px); }
+      to   { opacity: 1; transform: scale(1)   translateY(0); }
+    }
+
+    .cm.bot  { background: var(--s2); align-self: flex-start; border-bottom-left-radius:  4px; }
+    .cm.user { background: var(--blm); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+
+    /* Typing indicator */
+    .ctyping {
+      display: flex;
+      gap: 4px;
+      padding: 10px 13px;
+      background: var(--s2);
+      border-radius: 12px;
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+    }
+
+    .typd {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--tx3);
+      animation: typb 1s ease-in-out infinite;
+    }
+
+    .typd:nth-child(2) { animation-delay: .15s; }
+    .typd:nth-child(3) { animation-delay: .3s; }
+
+    @keyframes typb {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-5px); }
+    }
+
+    /* Input row */
+    .cinpwrap {
+      padding: 11px;
+      border-top: 1px solid var(--br);
+      display: flex;
+      gap: 8px;
+    }
+
+    .cinp {
+      flex: 1;
+      padding: 8px 13px;
+      background: var(--s2);
+      border: 1px solid var(--br);
+      border-radius: 8px;
+      color: var(--tx);
+      font-size: .81rem;
+      outline: none;
+      font-family: var(--fb);
+      transition: border-color .2s;
+    }
+
+    .cinp:focus { border-color: var(--bll); }
+
+    .csnd {
+      padding: 8px 15px;
+      border-radius: 8px;
+      background: var(--bll);
+      border: none;
+      cursor: none;
+      color: #fff;
+      font-size: 13px;
+      transition: background .2s;
+    }
+
+    .csnd:hover { background: var(--blm); }
+
+    /* Quick suggestion chips */
+    .csuggs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      padding: 0 14px 10px;
+    }
+
+    .csugg {
+      padding: 5px 10px;
+      border-radius: 100px;
+      font-size: .72rem;
+      background: var(--s2);
+      border: 1px solid var(--br);
+      color: var(--tx2);
+      cursor: none;
+      transition: all .2s;
+    }
+
+    .csugg:hover {
+      border-color: var(--bll);
+      color: var(--bll);
+    }
+
+
+    /* ── 20. FOOTER ───────────────────────────────────────────────── */
+    footer {
+      background: var(--bg2);
+      border-top: 1px solid var(--br);
+      padding: 52px 48px 32px;
+    }
+
+    .fgridf {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+      gap: 44px;
+      max-width: 1200px;
+      margin: 0 auto 44px;
+    }
+
+    .fbname {
+      font-family: var(--fd);
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin-bottom: 12px;
+    }
+
+    .fbname b { color: var(--grn); }
+
+    .fbdesc {
+      font-size: .83rem;
+      color: var(--tx2);
+      line-height: 1.65;
+      margin-bottom: 20px;
+    }
+
+    .fsocials { display: flex; gap: 9px; }
+
+    .fsocbtn {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: var(--s2);
+      border: 1px solid var(--br);
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+      cursor: none;
+      transition: all .25s;
+      text-decoration: none;
+      color: var(--tx2);
+    }
+
+    .fsocbtn:hover {
+      border-color: var(--grn);
+      color: var(--grn);
+      transform: translateY(-2px);
+    }
+
+    .fhead {
+      font-family: var(--fd);
+      font-weight: 700;
+      font-size: .88rem;
+      margin-bottom: 15px;
+    }
+
+    .flinks { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+    .flinks a {
+      font-size: .83rem;
+      color: var(--tx2);
+      text-decoration: none;
+      transition: color .2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .flinks a:hover { color: var(--grn); }
+
+    .flinks a::before {
+      content: '→';
+      opacity: 0;
+      transition: opacity .2s, transform .2s;
+      transform: translateX(-4px);
+    }
+
+    .flinks a:hover::before {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .fbot {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 24px;
+      border-top: 1px solid var(--br);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: .78rem;
+      color: var(--tx3);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .fteam { display: flex; align-items: center; gap: 8px; }
+
+    .ftav {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--pur));
+      display: grid;
+      place-items: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      border: 2px solid var(--bg2);
+      margin-left: -7px;
+      transition: transform .2s;
+    }
+
+    .ftav:first-child { margin-left: 0; }
+
+    .ftav:hover {
+      transform: translateY(-3px) scale(1.1);
+      z-index: 1;
+    }
+
+
+    /* ── 21. SCROLL REVEAL ANIMATION ─────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .65s var(--eo), transform .65s var(--eo);
+    }
+
+    .reveal.vis { opacity: 1; transform: translateY(0); }
+
+    .reveal:nth-child(1) { transition-delay: .05s; }
+    .reveal:nth-child(2) { transition-delay: .12s; }
+    .reveal:nth-child(3) { transition-delay: .19s; }
+    .reveal:nth-child(4) { transition-delay: .26s; }
+    .reveal:nth-child(5) { transition-delay: .33s; }
+    .reveal:nth-child(6) { transition-delay: .40s; }
+
+
+    /* ── 22. RESPONSIVE BREAKPOINTS ──────────────────────────────── */
+    @media (max-width: 900px) {
+      nav      { padding: 0 20px; }
+      .nlinks  { display: none; }
+      section  { padding: 64px 20px; }
+
+      .hlayout,
+      .sgrid,
+      .slayout,
+      .cgrid,
+      .fgridf    { grid-template-columns: 1fr; }
+
+      .ccrd.wide { grid-column: span 1; }
+      .ssteps    { width: 100%; grid-template-columns: 1fr; }
+
+      footer     { padding: 44px 20px 28px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============================================================
+       BACKGROUND ELEMENTS
+       ============================================================ -->
+
+  <!-- Particle canvas -->
+  <canvas id="canvas"></canvas>
+
+  <!-- Custom cursor elements -->
+  <div id="cdot"></div>
+  <div id="cring"></div>
+
+
+  <!-- ============================================================
+       SCAN OVERLAY (full-screen model during analysis)
+       ============================================================ -->
+  <div id="scanOverlay">
+
+    <!-- Matrix rain background -->
+    <div id="matbg" style="position:absolute;inset:0;overflow:hidden;pointer-events:none"></div>
+
+    <!-- Animated hex rings + emoji -->
+    <div class="hexring" style="position:relative">
+      <svg class="hexo" viewBox="0 0 160 160">
+        <polygon points="80,8 148,44 148,116 80,152 12,116 12,44"
+          fill="none" stroke="rgba(34,197,94,.3)" stroke-width="1.5" stroke-dasharray="8 4"/>
+      </svg>
+      <svg class="hexi" viewBox="0 0 112 112" style="position:absolute;top:12.5%;left:12.5%;width:75%;height:75%">
+        <polygon points="56,6 106,33 106,79 56,106 6,79 6,33"
+          fill="none" stroke="rgba(59,130,246,.4)" stroke-width="1.5"/>
+      </svg>
+      <div class="hexcenter" id="scanEmoji">🔬</div>
+    </div>
+
+    <!-- Scan status text -->
+    <div class="scantitle" id="scanTitle">Initializing AI Engine</div>
+    <div class="scansub"   id="scanSub">Preparing threat detection modules…</div>
+
+    <!-- Overall progress bar -->
+    <div class="spwrap">
+      <div class="sptrack">
+        <div class="spfill" id="spfill"></div>
+      </div>
+      <div class="splabel">
+        <span id="spPct">0%</span>
+        <span id="spStep">Starting…</span>
+      </div>
+    </div>
+
+    <!-- Individual step indicators -->
+    <div class="ssteps" id="ssteps">
+      <div class="sstep" id="ss0"><span class="sstep-i">🔤</span><span class="sstep-t">Tokenizing Text</span><span class="sstep-c"></span></div>
+      <div class="sstep" id="ss1"><span class="sstep-i">📐</span><span class="sstep-t">Extracting Features</span><span class="sstep-c"></span></div>
+      <div class="sstep" id="ss2"><span class="sstep-i">🧠</span><span class="sstep-t">Running ML Model</span><span class="sstep-c"></span></div>
+      <div class="sstep" id="ss3"><span class="sstep-i">🔗</span><span class="sstep-t">Scanning URLs</span><span class="sstep-c"></span></div>
+      <div class="sstep" id="ss4"><span class="sstep-i">🚩</span><span class="sstep-t">Detecting Red Flags</span><span class="sstep-c"></span></div>
+      <div class="sstep" id="ss5"><span class="sstep-i">📊</span><span class="sstep-t">Computing Confidence</span><span class="sstep-c"></span></div>
+    </div>
+
+  </div><!-- /#scanOverlay -->
+
+
+  <!-- ============================================================
+       TOAST NOTIFICATION
+       ============================================================ -->
+  <div class="toast" id="toast">
+    <span class="toast-i" id="toastI">✅</span>
+    <span class="toast-t" id="toastT"></span>
+  </div>
+
+
+  <!-- ============================================================
+       NAVIGATION
+       ============================================================ -->
+  <nav>
+    <!-- Logo -->
+    <a href="#home" class="nlogo">
+      <div class="nshield">🛡️</div>
+      <span class="nword">Phish<b>Guard</b> AI</span>
+    </a>
+
+    <!-- Links -->
+    <ul class="nlinks">
+      <li><a href="#home"      class="active">Home</a></li>
+      <li><a href="#analyze">Analyze</a></li>
+      <li><a href="#dashboard">Dashboard</a></li>
+      <li><a href="#reports">Reports</a></li>
+      <li><a href="#education">Learn</a></li>
+    </ul>
+
+    <!-- Actions -->
+    <div class="nacts">
+      <button class="thbtn" id="thbtn">🌙</button>
+      <div class="navpill">
+        <div class="navatar">CB</div>
+        Code Breakers
+      </div>
+    </div>
+  </nav>
+
+
+  <!-- ============================================================
+       SECTION: HERO
+       ============================================================ -->
+  <section id="home">
+    <div class="hlayout">
+
+      <!-- Left — copy & stats -->
+      <div>
+        <div class="hbadge">
+          <span class="ldot"></span> Live Threat Detection · Powered by ML
+        </div>
+
+        <h1 class="htitle">
+          Stop Phishing<br>
+          <span class="hl">Before It Bites</span>
+        </h1>
+
+        <p class="hdesc">
+          Our AI scans emails, SMS, and URLs in under a second — detecting manipulation tactics,
+          suspicious links, and social engineering patterns with <strong>98.4% accuracy</strong>.
+        </p>
+
+        <div class="hbtns">
+          <a href="#analyze"   class="btn btnp">🔍 Analyze Now</a>
+          <a href="#dashboard" class="btn btng">📊 View Dashboard</a>
+        </div>
+
+        <div class="hstats">
+          <div><div class="snum">98.4%</div><div class="slabel">Accuracy</div></div>
+          <div><div class="snum">2.1M+</div><div class="slabel">Blocked</div></div>
+          <div><div class="snum">&lt;1s</div><div class="slabel">Scan Time</div></div>
+          <div><div class="snum">6</div>    <div class="slabel">Threat Types</div></div>
+        </div>
+      </div>
+
+      <!-- Right — animated terminal -->
+      <div class="hvisual">
+        <div class="term">
+          <div class="tbar">
+            <div class="tdot" style="background:#ff5f57"></div>
+            <div class="tdot" style="background:#febc2e"></div>
+            <div class="tdot" style="background:#28c840"></div>
+            <div class="ttitle">phishguard-ai — threat-analyzer v3.1</div>
+          </div>
+          <div class="tbody" id="termBody"></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SECTION: ANALYZE
+       ============================================================ -->
+  <section id="analyze">
+
+    <!-- Section header -->
+    <div style="max-width:1200px;margin:0 auto 32px" class="reveal">
+      <div class="eyebrow">AI-Powered Scanner</div>
+      <div class="stitle">🔍 Analyze Suspicious Content</div>
+      <div class="ssub">
+        Paste any email, SMS, or URL. Our ML model detects phishing patterns,
+        scores the threat level, and explains every red flag found — in seconds.
+      </div>
+    </div>
+
+    <div class="sgrid">
+
+      <!-- Input card -->
+      <div class="gcard reveal">
+        <div class="ilabel">📋 Message Input</div>
+        <div class="isub">Paste the full message — the more context, the more accurate the analysis</div>
+
+        <div class="twrap">
+          <textarea id="si" placeholder="Paste suspicious email, SMS, or URL here…
+
+💡 Example:
+Subject: ⚠️ URGENT — Account will be suspended!
+
+Dear Customer, suspicious activity was detected. Click immediately to verify: http://secure-paypal-verify.scam.co/login
+
+You must enter your password and credit card details within 24 hours or face permanent account closure." rows="9"></textarea>
+        </div>
+
+        <div class="ccount" id="cc">0 / 5000 characters</div>
+
+        <div class="brow">
+          <button class="btn btnp bsm" id="abtn">🚀 Detect Phishing</button>
+          <button class="btn btnr bsm" id="clrbtn">🗑 Clear</button>
+          <button class="btn btnb bsm" id="sampbtn">📝 Load Sample</button>
+        </div>
+
+        <!-- Drag & drop zone -->
+        <div class="dz" id="dz">
+          <span class="dzicon">📂</span>
+          <div class="dztxt"><b>Drag &amp; drop</b> a .txt file, or click to browse</div>
+          <input type="file" accept=".txt" id="fi" style="display:none" />
+        </div>
+      </div>
+
+      <!-- Results panel -->
+      <div class="rpanel" id="rpanel">
+
+        <!-- Verdict card (default empty state) -->
+        <div class="vcard vempty" id="vcard">
+          <div class="vhead">
+            <span class="vicon">🔎</span>
+            <span class="vbadge vbn">Awaiting Scan</span>
+          </div>
+          <div style="font-size:.88rem;color:var(--tx2);line-height:1.65">
+            Submit content to see the <strong style="color:var(--tx)">AI verdict</strong>,
+            confidence score, and detailed threat explanation.
+          </div>
+          <div style="margin-top:18px;padding:14px;background:rgba(255,255,255,.025);border-radius:10px;font-size:.8rem;color:var(--tx3);border-left:3px solid var(--br)">
+            <strong style="color:var(--tx2)">How it works:</strong> The model analyzes syntax patterns,
+            keyword density, URL structures, urgency signals, and sender mimicry to classify content in real time.
+          </div>
+        </div>
+
+        <!-- Gauge widget -->
+        <div class="gcardgauge">
+          <div class="gtitle">⚡ Risk Score</div>
+          <div class="gsvgwrap">
+            <svg class="gsvg" viewBox="0 0 180 100">
+              <path class="garctk" d="M20,90 A70,70 0 0,1 160,90"/>
+              <path class="garcf" id="gaf" d="M20,90 A70,70 0 0,1 160,90" stroke="var(--tx3)"/>
+            </svg>
+            <div class="gval" id="gval" style="color:var(--tx3)">—</div>
+          </div>
+          <div class="gsub" id="gsub">No analysis yet</div>
+          <div class="gpills">
+            <span class="gpill gpl">0–40 Safe</span>
+            <span class="gpill gpm">40–70 Caution</span>
+            <span class="gpill gph">70–100 Danger</span>
+          </div>
+        </div>
+
+      </div><!-- /.rpanel -->
+
+    </div><!-- /.sgrid -->
+
+  </section>
+
+
+  <!-- ============================================================
+       SECTION: RED FLAGS
+       ============================================================ -->
+  <section id="reports" style="padding-top:16px">
+
+    <div style="max-width:1200px;margin:0 auto 32px" class="reveal">
+      <div class="eyebrow">Threat Intelligence</div>
+      <div class="stitle">🚩 Red Flag Breakdown</div>
+      <div class="ssub">
+        Every detected phishing indicator is highlighted with context on why it's suspicious
+        and how attackers exploit it.
+      </div>
+    </div>
+
+    <!-- Populated dynamically by renderFlags() -->
+    <div class="fgrid" id="fg"></div>
+
+  </section>
+
+
+  <!-- ============================================================
+       SECTION: DASHBOARD
+       ============================================================ -->
+  <section id="dashboard">
+
+    <div style="max-width:1200px;margin:0 auto 32px" class="reveal">
+      <div class="eyebrow">Analytics</div>
+      <div class="stitle">📊 Threat Dashboard</div>
+      <div class="ssub">
+        Real-time visualizations of detection patterns, keyword frequency, and historical threat trends.
+      </div>
+    </div>
+
+    <div class="cgrid">
+      <!-- Doughnut chart -->
+      <div class="ccrd reveal">
+        <div class="ctitle">Detection Breakdown</div>
+        <div class="csub">Phishing vs Legitimate</div>
+        <div class="chwrap"><canvas id="pc2"></canvas></div>
+      </div>
+
+      <!-- Line chart -->
+      <div class="ccrd wide reveal">
+        <div class="ctitle">Weekly Threat Trend</div>
+        <div class="csub">Phishing vs legitimate over 7 days</div>
+        <div class="chwrap"><canvas id="lc"></canvas></div>
+      </div>
+
+      <!-- Bar chart (full width) -->
+      <div class="ccrd reveal" style="grid-column:span 3">
+        <div class="ctitle">Top Detected Keywords</div>
+        <div class="csub">Most frequently flagged phishing terms</div>
+        <div class="chwrap" style="height:180px"><canvas id="bc"></canvas></div>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- ============================================================
+       SECTION: SECURITY AWARENESS SCORE
+       ============================================================ -->
+  <section style="padding-top:16px">
+
+    <div style="max-width:1200px;margin:0 auto 32px" class="reveal">
+      <div class="eyebrow">Your Profile</div>
+      <div class="stitle">🏆 Security Awareness Score</div>
+      <div class="ssub">
+        How well-equipped are you against phishing? Based on behavioral patterns and awareness metrics.
+      </div>
+    </div>
+
+    <div class="slayout reveal">
+
+      <!-- Semi-circle gauge -->
+      <div>
+        <div class="bgsvgwrap">
+          <svg class="bgsvg" viewBox="0 0 220 120">
+            <path class="bgtrack" d="M22,110 A88,88 0 0,1 198,110"/>
+            <path class="bgfill"  id="bgf" d="M22,110 A88,88 0 0,1 198,110"/>
+          </svg>
+          <div class="bgval">78</div>
+        </div>
+        <div class="bgsubl">/ 100 · Good</div>
+      </div>
+
+      <!-- Score breakdown bars -->
+      <div class="sdets">
+        <div class="sitem">
+          <div class="sih"><span>Email Safety Practices</span><span style="color:var(--grn);font-weight:600">88%</span></div>
+          <div class="sibar"><div class="sibf" data-w="88" style="background:var(--grn)"></div></div>
+        </div>
+        <div class="sitem">
+          <div class="sih"><span>Link Verification Habits</span><span style="color:var(--amb);font-weight:600">72%</span></div>
+          <div class="sibar"><div class="sibf" data-w="72" style="background:var(--amb)"></div></div>
+        </div>
+        <div class="sitem">
+          <div class="sih"><span>Password Hygiene</span><span style="color:var(--amb);font-weight:600">65%</span></div>
+          <div class="sibar"><div class="sibf" data-w="65" style="background:var(--amb)"></div></div>
+        </div>
+        <div class="sitem">
+          <div class="sih"><span>Attachment Caution</span><span style="color:var(--grn);font-weight:600">94%</span></div>
+          <div class="sibar"><div class="sibf" data-w="94" style="background:var(--grn)"></div></div>
+        </div>
+        <div class="sitem">
+          <div class="sih"><span>Phishing Recognition</span><span style="color:var(--red);font-weight:600">58%</span></div>
+          <div class="sibar"><div class="sibf" data-w="58" style="background:var(--red)"></div></div>
+        </div>
+      </div>
+
+    </div><!-- /.slayout -->
+
+  </section>
+
+
+  <!-- ============================================================
+       SECTION: EDUCATION / AWARENESS HUB
+       ============================================================ -->
+  <section id="education">
+
+    <div style="max-width:1200px;margin:0 auto 32px" class="reveal">
+      <div class="eyebrow">Awareness Hub</div>
+      <div class="stitle">💡 Know Your Threats</div>
+      <div class="ssub">
+        Understanding how phishing works is your best defense. Explore the tactics attackers use.
+      </div>
+    </div>
+
+    <div class="egrid">
+
+      <div class="ecard reveal">
+        <div class="etag">Most Common</div>
+        <div class="eico">📧</div>
+        <div class="etitle">Email Phishing</div>
+        <div class="edesc">Fraudulent emails impersonate banks, tech companies, or colleagues to steal credentials. Always verify the full sender domain before clicking anything.</div>
+        <button class="elearn">Learn to spot it →</button>
+      </div>
+
+      <div class="ecard reveal">
+        <div class="etag">High Risk</div>
+        <div class="eico">🔗</div>
+        <div class="etitle">Malicious Links</div>
+        <div class="edesc">Typosquatted URLs (paypa1.com) hide dangerous destinations. Hover every link before clicking and scan suspicious URLs at VirusTotal.com.</div>
+        <button class="elearn">Check links safely →</button>
+      </div>
+
+      <div class="ecard reveal">
+        <div class="etag">Rising Threat</div>
+        <div class="eico">📱</div>
+        <div class="etitle">Smishing (SMS)</div>
+        <div class="edesc">Fake texts from delivery services or banks. Never click unsolicited SMS links — go directly to official websites by typing the address yourself.</div>
+        <button class="elearn">Stay protected →</button>
+      </div>
+
+      <div class="ecard reveal">
+        <div class="etag">Social Attack</div>
+        <div class="eico">🎭</div>
+        <div class="etitle">Social Engineering</div>
+        <div class="edesc">Psychological manipulation exploiting urgency, authority, and fear. These attacks bypass technology by targeting human psychology.</div>
+        <button class="elearn">Recognize tactics →</button>
+      </div>
+
+      <div class="ecard reveal">
+        <div class="etag">Targeted</div>
+        <div class="eico">🎯</div>
+        <div class="etitle">Spear Phishing</div>
+        <div class="edesc">Personalized attacks using your name and info from social media. Feels legitimate because it's designed specifically for you.</div>
+        <button class="elearn">Defend yourself →</button>
+      </div>
+
+      <div class="ecard reveal">
+        <div class="etag">Corporate</div>
+        <div class="eico">👔</div>
+        <div class="etitle">BEC / CEO Fraud</div>
+        <div class="edesc">Email impersonates your CEO to authorize wire transfers. Always verbally verify unusual financial requests — email alone is never enough.</div>
+        <button class="elearn">Protect your org →</button>
+      </div>
+
+    </div><!-- /.egrid -->
+
+  </section>
+
+
+  <!-- ============================================================
+       SECTION: SCAN HISTORY / AUDIT TRAIL
+       ============================================================ -->
+  <section style="padding-top:16px">
+
+    <div style="max-width:1200px;margin:0 auto 32px" class="reveal">
+      <div class="eyebrow">Audit Trail</div>
+      <div class="stitle">🕒 Scan History</div>
+      <div class="ssub">Every message you've analyzed — searchable, exportable, and reviewable.</div>
+    </div>
+
+    <!-- Controls row -->
+    <div class="hctrl reveal">
+      <input class="sinp" id="hs" placeholder="🔍 Search by text or verdict…" />
+      <button class="btn btng bsm" id="dlb">⬇ Export CSV</button>
+      <button class="btn btnr bsm" id="clhb">🗑 Clear All</button>
+    </div>
+
+    <!-- History table -->
+    <div class="twrp reveal">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Message Preview</th>
+            <th>Verdict</th>
+            <th>Confidence</th>
+            <th>Date &amp; Time</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="ht"></tbody>
+      </table>
+    </div>
+
+  </section>
+
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer>
+    <div class="fgridf">
+
+      <!-- Brand column -->
+      <div>
+        <div class="fbname">Phish<b>Guard</b> AI</div>
+        <div class="fbdesc">AI-powered phishing detection by Team Code Breakers. Real-time ML analysis for emails, SMS, and URLs.</div>
+        <div class="fsocials">
+          <a class="fsocbtn" href="https://github.com/rihanstranger09/hackathon01.git" title="GitHub">⌨</a>
+          <a class="fsocbtn" href="https://www.linkedin.com/in/code-breakers-2517503b6/" title="LinkedIn">in</a>
+          <a class="fsocbtn" href="https://x.com/phishguardai123" title="Twitter">𝕏</a>
+          <a class="fsocbtn" href="https://mail.google.com/mail/u/2/#inbox" title="Email">✉</a>
+        </div>
+      </div>
+
+      <!-- Product links -->
+      <div>
+        <div class="fhead">Product</div>
+        <ul class="flinks">
+          <li><a href="#analyze">Analyze Message</a></li>
+          <li><a href="#dashboard">Dashboard</a></li>
+          <li><a href="#reports">Threat Reports</a></li>
+          <li><a href="#education">Awareness Hub</a></li>
+        </ul>
+      </div>
+
+      <!-- Team links -->
+      <div>
+        <div class="fhead">Team</div>
+        <ul class="flinks">
+          <li><a href="#">Rihan</a></li>
+          <li><a href="#">Samyak</a></li>
+          <li><a href="#">Manukrishna</a></li>
+          <li><a href="#">Manish</a></li>
+        </ul>
+      </div>
+
+      <!-- Legal links -->
+      <div>
+        <div class="fhead">Legal</div>
+        <ul class="flinks">
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Use</a></li>
+          <li><a href="https://github.com/rihanstranger09/hackathon01.git">GitHub Repo</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="fbot">
+      <span>© 2025 PhishGuard AI — Team Code Breakers. Detect | Prevent | Educate.</span>
+      <div class="fteam">
+        <div class="ftav">R</div>
+        <div class="ftav">S</div>
+        <div class="ftav">M</div>
+        <div class="ftav">M</div>
+        <span style="margin-left:10px">Built with ❤️ for cybersecurity</span>
+      </div>
+    </div>
+
+  </footer>
+
+
+  <!-- ============================================================
+       CHATBOT
+       ============================================================ -->
+
+  <!-- FAB toggle button -->
+  <button class="cfab notif" id="cfab">🤖</button>
+
+  <!-- Chat window -->
+  <div class="cbox" id="cbox">
+    <div class="chead">
+      <div class="cheadtitle">🛡️ PhishGuard Assistant</div>
+      <button class="ccls" id="ccls">✕</button>
+    </div>
+
+    <div class="cbody" id="cbody">
+      <div class="cm bot">Hi! I'm your AI security advisor. 👋 Ask me anything about phishing, email safety, or how to protect yourself online.</div>
+    </div>
+
+    <div class="csuggs">
+      <button class="csugg" onclick="askBot('What is phishing?')">What is phishing?</button>
+      <button class="csugg" onclick="askBot('email safety tips')">Email safety</button>
+      <button class="csugg" onclick="askBot('url safety')">URL safety</button>
+      <button class="csugg" onclick="askBot('help')">All topics</button>
+    </div>
+
+    <div class="cinpwrap">
+      <input  class="cinp" id="cinp" placeholder="Ask about security…" />
+      <button class="csnd" id="csnd">➤</button>
+    </div>
+  </div>
+
+
+  <!-- ============================================================
+       JAVASCRIPT
+       ============================================================ -->
+  <script>
+    'use strict';
+     let awarenessScore = 78;
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 1 — PARTICLE CANVAS
+       ══════════════════════════════════════════════════════════════ */
+
+    const cv  = document.getElementById('canvas');
+    const cx2 = cv.getContext('2d');
+    let W, H, parts = [];
+
+    function resize() {
+      W = cv.width  = innerWidth;
+      H = cv.height = innerHeight;
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    class P {
+      constructor() { this.reset(); }
+
+      reset() {
+        this.x  = Math.random() * W;
+        this.y  = Math.random() * H;
+        this.vx = (Math.random() - .5) * .35;
+        this.vy = (Math.random() - .5) * .35;
+        this.r  = Math.random() * 1.5 + .5;
+        this.a  = Math.random() * .4 + .1;
+        this.c  = Math.random() > .5 ? '34,197,94' : '59,130,246';
+      }
+
+      draw() {
+        cx2.beginPath();
+        cx2.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        cx2.fillStyle = `rgba(${this.c},${this.a})`;
+        cx2.fill();
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+      }
+    }
+
+    for (let i = 0; i < 80; i++) parts.push(new P());
+
+    function drawP() {
+      cx2.clearRect(0, 0, W, H);
+
+      // Draw particles
+      parts.forEach(p => { p.update(); p.draw(); });
+
+      // Draw connecting lines between nearby particles
+      for (let i = 0; i < parts.length; i++) {
+        for (let j = i + 1; j < parts.length; j++) {
+          const dx = parts[i].x - parts[j].x;
+          const dy = parts[i].y - parts[j].y;
+          const d  = Math.sqrt(dx * dx + dy * dy);
+          if (d < 120) {
+            cx2.beginPath();
+            cx2.moveTo(parts[i].x, parts[i].y);
+            cx2.lineTo(parts[j].x, parts[j].y);
+            cx2.strokeStyle = `rgba(59,130,246,${(1 - d / 120) * .06})`;
+            cx2.lineWidth = .5;
+            cx2.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(drawP);
+    }
+
+    drawP();
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 2 — CUSTOM CURSOR
+       ══════════════════════════════════════════════════════════════ */
+
+    const cdot  = document.getElementById('cdot');
+    const cring = document.getElementById('cring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    // Dot follows mouse exactly
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX;
+      my = e.clientY;
+      cdot.style.left = mx + 'px';
+      cdot.style.top  = my + 'px';
+    });
+
+    // Ring lags behind with lerp
+    (function ac() {
+      rx += (mx - rx) * .12;
+      ry += (my - ry) * .12;
+      cring.style.left = rx + 'px';
+      cring.style.top  = ry + 'px';
+      requestAnimationFrame(ac);
+    })();
+
+    // Press/release size changes
+    document.addEventListener('mousedown', () => {
+      cdot.style.width   = '14px'; cdot.style.height  = '14px';
+      cring.style.width  = '20px'; cring.style.height = '20px';
+    });
+    document.addEventListener('mouseup', () => {
+      cdot.style.width   = '8px';  cdot.style.height  = '8px';
+      cring.style.width  = '34px'; cring.style.height = '34px';
+    });
+
+    // Expand ring over interactive elements
+    document.querySelectorAll('a, button, [data-click]').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cring.style.width       = '50px';
+        cring.style.height      = '50px';
+        cring.style.borderColor = 'rgba(34,197,94,.5)';
+      });
+      el.addEventListener('mouseleave', () => {
+        cring.style.width       = '34px';
+        cring.style.height      = '34px';
+        cring.style.borderColor = 'rgba(255,255,255,.3)';
+      });
+    });
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 3 — THEME TOGGLE
+       ══════════════════════════════════════════════════════════════ */
+
+    document.getElementById('thbtn').addEventListener('click', function () {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      this.textContent = isDark ? '☀️' : '🌙';
+    });
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 4 — TOAST NOTIFICATION
+       ══════════════════════════════════════════════════════════════ */
+
+    function showToast(msg, icon = '✅') {
+      document.getElementById('toastT').textContent = msg;
+      document.getElementById('toastI').textContent = icon;
+      const t = document.getElementById('toast');
+      t.classList.add('show');
+      clearTimeout(t._t);
+      t._t = setTimeout(() => t.classList.remove('show'), 3400);
+    }
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 5 — TERMINAL ANIMATION
+       ══════════════════════════════════════════════════════════════ */
+
+    const tlines = [
+      { type: 'cmd',   txt: 'phishguard --init',                      d: 400  },
+      { type: 'out',   cls: 'info', txt: 'Loading threat intelligence database…', d: 900  },
+      { type: 'bar',   w: '100%',   color: '#3b82f6',                  d: 1200 },
+      { type: 'out',   cls: 'ok',   txt: '✓ 2.1M threat signatures loaded',       d: 1800 },
+      { type: 'cmd',   txt: 'scan --mode=realtime --ai=v3',            d: 2400 },
+      { type: 'out',   cls: '',     txt: 'Tokenizing input…',                     d: 2900 },
+      { type: 'out',   cls: 'warn', txt: '⚠  Suspicious keyword density: HIGH',   d: 3400 },
+      { type: 'out',   cls: 'warn', txt: '⚠  URL pattern anomaly detected',       d: 3900 },
+      { type: 'alert', txt: '🚨 THREAT DETECTED — Confidence: 96.2%',             d: 4500 },
+      { type: 'cmd',   txt: 'explain --flags',                         d: 5200 },
+      { type: 'out',   cls: 'err',  txt: '→ Urgency manipulation language',        d: 5700 },
+      { type: 'out',   cls: 'err',  txt: '→ Lookalike domain: paypa1.com',         d: 6100 },
+      { type: 'out',   cls: 'err',  txt: '→ Credential harvesting attempt',        d: 6500 },
+      { type: 'out',   cls: 'ok',   txt: '✓ Report generated. User protected.',    d: 7000 },
+    ];
+
+    const tb = document.getElementById('termBody');
+
+    tlines.forEach(l => {
+      setTimeout(() => {
+        if (l.type === 'cmd') {
+          const d = document.createElement('div');
+          d.className = 'tline';
+          d.innerHTML = `<span class="tp">phishguard$</span><span class="tc"> ${l.txt}</span>`;
+          tb.appendChild(d);
+        } else if (l.type === 'out') {
+          const d = document.createElement('div');
+          d.className = 'tline';
+          d.innerHTML = `<span class="to ${l.cls}">${l.txt}</span>`;
+          tb.appendChild(d);
+        } else if (l.type === 'bar') {
+          const w = document.createElement('div');
+          w.innerHTML = `<div class="tpbar"><div class="tpfill" style="background:${l.color}"></div></div>`;
+          tb.appendChild(w);
+        } else if (l.type === 'alert') {
+          const d = document.createElement('div');
+          d.className = 'talert';
+          d.innerHTML = `<span style="color:var(--red)">${l.txt}</span>`;
+          tb.appendChild(d);
+        }
+        tb.scrollTop = tb.scrollHeight;
+      }, l.d);
+    });
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 6 — RED FLAGS ENGINE
+       ══════════════════════════════════════════════════════════════ */
+
+    const FLAGS = [
+      {
+        title: 'Urgency & Pressure',
+        desc:  'Forces hasty action with "Act Now!" or "24 Hours!" to prevent rational thinking. A classic manipulation tactic.',
+        icon:  '⏰',
+        kw:    ['urgent','immediately','act now','limited time','expire','asap','final warning','24 hour','hurry'],
+      },
+      {
+        title: 'Suspicious URL / Domain',
+        desc:  'Typosquatted domains, unexpected subdomains, or non-HTTPS links — classic phishing delivery mechanisms.',
+        icon:  '🔗',
+        kw:    ['http://','verify','secure-','account-','login','bank-','paypal','amazon'],
+      },
+      {
+        title: 'Credential Request',
+        desc:  'Asks for passwords, PINs, or credit card numbers. Legitimate services never request these via email.',
+        icon:  '🔑',
+        kw:    ['password','verify','credit card','ssn','pin','update account','confirm','personal information'],
+      },
+      {
+        title: 'Sender Impersonation',
+        desc:  'Mimics trusted brands using vague greetings like "Dear Customer" — a telltale sign of mass phishing.',
+        icon:  '👤',
+        kw:    ['dear customer','dear user','dear account holder','dear valued','account suspended','dear member'],
+      },
+      {
+        title: 'Fake Rewards / Prizes',
+        desc:  "Claims you've won money or prizes — bait designed to get you to click and provide personal data.",
+        icon:  '🎁',
+        kw:    ['winner','won','prize','reward','free','selected','congratulations','claim'],
+      },
+      {
+        title: 'Threats & Penalties',
+        desc:  'Uses fear of account closure, legal action, or fines to coerce compliance with dangerous requests.',
+        icon:  '⚠️',
+        kw:    ['suspended','locked','blocked','terminated','penalty','legal action','arrest','closed permanently'],
+      },
+    ];
+
+    function renderFlags(text) {
+      const g  = document.getElementById('fg');
+      g.innerHTML = '';
+      const lc = text.toLowerCase();
+
+      FLAGS.forEach((f, i) => {
+        const found = f.kw.filter(k => lc.includes(k));
+        const hit   = found.length > 0;
+        const d     = document.createElement('div');
+
+        d.className           = 'fcard reveal' + (hit ? ' hit' : '');
+        d.style.transitionDelay = (i * .07) + 's';
+        d.innerHTML = `
+          <div class="ficowrap">${f.icon}</div>
+          <div style="flex:1">
+            <div class="ftitle">${f.title}</div>
+            <div class="fdesc">${f.desc}</div>
+            ${hit ? `<div class="fkws">${found.map(k => `<span class="fkw">${k}</span>`).join('')}</div>` : ''}
+            <span class="fbadge ${hit ? 'fbhit' : 'fbok'}">
+              ${hit ? `🚨 ${found.length} signal${found.length > 1 ? 's' : ''} found` : '✅ Not detected'}
+            </span>
+          </div>`;
+
+        g.appendChild(d);
+        setTimeout(() => d.classList.add('vis'), 50 + i * 80);
+      });
+    }
+
+    renderFlags(''); // Render initial (empty) state
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 7 — GAUGE WIDGET
+       ══════════════════════════════════════════════════════════════ */
+
+    function setGauge(score) {
+      const f = document.getElementById('gaf');
+      const v = document.getElementById('gval');
+      const s = document.getElementById('gsub');
+      const color = score > 70 ? '#ef4444' : score > 40 ? '#f59e0b' : '#22c55e';
+
+      f.style.stroke            = color;
+      f.style.strokeDashoffset  = 282 - (282 * score / 100);
+      v.textContent             = score;
+      v.style.color             = color;
+      s.textContent             = score > 70 ? '⚠️ HIGH RISK' : score > 40 ? '⚡ MODERATE RISK' : '✅ LOW RISK';
+    }
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 8 — SCAN OVERLAY
+       ══════════════════════════════════════════════════════════════ */
+
+    const STEPS = [
+      { id: 'ss0', msg: 'Tokenizing text…',             emoji: '🔤', pct: 15  },
+      { id: 'ss1', msg: 'Extracting linguistic features…', emoji: '📐', pct: 32  },
+      { id: 'ss2', msg: 'Running neural classifier…',   emoji: '🧠', pct: 55  },
+      { id: 'ss3', msg: 'Scanning URL patterns…',       emoji: '🔗', pct: 70  },
+      { id: 'ss4', msg: 'Detecting red flags…',         emoji: '🚩', pct: 85  },
+      { id: 'ss5', msg: 'Computing confidence score…',  emoji: '📊', pct: 100 },
+    ];
+
+    function spawnMatrix() {
+      const bg    = document.getElementById('matbg');
+      bg.innerHTML = '';
+      const chars = 'ABCDEF0123456789@#$%PHISH';
+
+      for (let i = 0; i < 14; i++) {
+        const el = document.createElement('div');
+        el.className = 'matline';
+        el.style.left              = (3 + i * 7) + '%';
+        el.style.animationDuration = (3 + Math.random() * 4) + 's';
+        el.style.animationDelay    = (Math.random() * 3) + 's';
+
+        let t = '';
+        for (let j = 0; j < 22; j++) t += chars[Math.floor(Math.random() * chars.length)] + ' ';
+        el.textContent = t;
+        bg.appendChild(el);
+      }
+    }
+
+    function runScan(cb) {
+      const ov = document.getElementById('scanOverlay');
+      spawnMatrix();
+      ov.classList.add('active');
+      document.body.style.overflow = 'hidden';
+
+      // Reset all step states
+      STEPS.forEach(s => {
+        const el = document.getElementById(s.id);
+        if (el) { el.className = 'sstep'; el.querySelector('.sstep-c').textContent = ''; }
+      });
+
+      document.getElementById('spfill').style.width = '0%';
+      document.getElementById('spPct').textContent  = '0%';
+
+      let idx = 0;
+
+      function next() {
+        // Mark previous step done
+        if (idx > 0) {
+          const p = document.getElementById(STEPS[idx - 1].id);
+          if (p) { p.className = 'sstep done'; p.querySelector('.sstep-c').textContent = '✓'; }
+        }
+
+        // All steps complete
+        if (idx >= STEPS.length) {
+          document.getElementById('scanTitle').textContent  = 'Analysis Complete';
+          document.getElementById('scanSub').textContent    = 'Generating detailed report…';
+          document.getElementById('scanEmoji').textContent  = '✅';
+          setTimeout(() => {
+            ov.classList.remove('active');
+            document.body.style.overflow = '';
+            cb();
+          }, 700);
+          return;
+        }
+
+        // Activate current step
+        const s  = STEPS[idx];
+        const el = document.getElementById(s.id);
+        if (el) el.className = 'sstep active';
+
+        document.getElementById('scanTitle').textContent = 'Analyzing Content';
+        document.getElementById('scanSub').textContent   = s.msg;
+        document.getElementById('scanEmoji').textContent = s.emoji;
+        document.getElementById('spfill').style.width    = s.pct + '%';
+        document.getElementById('spPct').textContent     = s.pct + '%';
+        document.getElementById('spStep').textContent    = s.msg;
+
+        idx++;
+        setTimeout(next, 430 + Math.random() * 200);
+      }
+
+      next();
+    }
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 9 — ANALYSIS ENGINE
+       ══════════════════════════════════════════════════════════════ */
+
+    let history = [];
+
+    const SW = [
+      'urgent','immediately','act now','limited time','expire','asap','final warning',
+      'verify','click here','bank','password','suspended','login','account','free','winner',
+      'confirm','security alert','http://','credit card','personal information',
+      'dear customer','dear user','legal action','blocked','terminated','penalty',
+      'update account',
+    ];
+
+    function compute(text) {
+      const lc     = text.toLowerCase();
+      const hits   = SW.filter(w => lc.includes(w));
+      const hasUrl = /https?:\/\//.test(text);
+      const hasCaps = (text.match(/[A-Z]{2,}/g) || []).length > 2;
+      const score  = hits.length * 7 + (hasUrl ? 12 : 0) + (hasCaps ? 8 : 0);
+      const isPhish = score >= 20;
+      const conf   = Math.min(99, Math.max(52, 48 + score * 1.2 + Math.random() * 6));
+      return { isPhish, conf: parseFloat(conf.toFixed(1)), hits, score };
+    }
+
+    function renderVerdict(text, isPhish, conf) {
+      const card  = document.getElementById('vcard');
+      card.className = 'vcard ' + (isPhish ? 'vphish' : 'vsafe');
+      const words = text.trim().split(/\s+/).length;
+
+      card.innerHTML = `
+        <div class="vhead">
+          <span class="vicon">${isPhish ? '🚨' : '✅'}</span>
+          <span class="vbadge ${isPhish ? 'vbp' : 'vbs'}">${isPhish ? '⚠ Phishing Detected' : '✓ Legitimate Content'}</span>
+        </div>
+        <div class="vnum ${isPhish ? 'vnumphish' : 'vnumsafe'}" id="confNum">0%</div>
+        <div class="vlabel" style="margin-bottom:16px">AI Confidence Score</div>
+        <div class="vbar-wrap">
+          <div class="vbar-header"><span>Threat Level</span><span>${isPhish ? 'HIGH' : 'LOW'}</span></div>
+          <div class="vbar-track">
+            <div class="vbar-fill ${isPhish ? 'vbar-phish' : 'vbar-safe'}" id="vbf" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="vexplain ${isPhish ? 'phish' : 'safe'}">
+          <strong>${isPhish ? '⚠ Threat Detected' : '✓ Content Appears Safe'}</strong><br>
+          Scanned ${words} words (${text.length} chars).
+          ${isPhish
+            ? `Multiple phishing indicators found. <strong>Do NOT click links or provide personal information.</strong> Report this to your email provider immediately.`
+            : `No significant phishing patterns detected. Stay cautious — always verify unexpected requests through official channels.`
+          }
+        </div>`;
+
+      // Animate counter
+      const t0 = performance.now();
+      function tick(now) {
+        const p = Math.min(1, (now - t0) / 1200);
+        document.getElementById('confNum').textContent = Math.round(p * conf) + '%';
+        if (p < 1) requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+
+      // Animate bar & gauge
+      setTimeout(() => { const f = document.getElementById('vbf'); if (f) f.style.width = conf + '%'; }, 60);
+      setTimeout(() => setGauge(isPhish ? Math.round(conf) : Math.round(100 - conf)), 300);
+    }
+
+    // Analyze button
+    document.getElementById('abtn').addEventListener('click', () => {
+      const text = document.getElementById('si').value.trim();
+      if (!text) { showToast('Please enter text or upload a file first.', '⚠️'); return; }
+
+      runScan(() => {
+        const { isPhish, conf } = compute(text);
+        updateSecurityScore(isPhish);
+        if (isPhish) phishingCount++;
+        else safeCount++;
+
+updateDashboard(isPhish, text);
+        renderVerdict(text, isPhish, conf);
+        renderFlags(text);
+        addHistory(text, isPhish, conf);
+        showToast(isPhish ? '🚨 Phishing detected! Stay safe.' : '✅ Content looks safe.', isPhish ? '🚨' : '✅');
+        setTimeout(() => document.getElementById('analyze').scrollIntoView({ behavior: 'smooth' }), 200);
+      });
+    });
+
+    // Clear button
+    document.getElementById('clrbtn').addEventListener('click', () => {
+      document.getElementById('si').value       = '';
+      document.getElementById('cc').textContent = '0 / 5000 characters';
+      document.getElementById('cc').className   = 'ccount';
+
+      const c = document.getElementById('vcard');
+      c.className = 'vcard vempty';
+      c.innerHTML = `
+        <div class="vhead"><span class="vicon">🔎</span><span class="vbadge vbn">Awaiting Scan</span></div>
+        <div style="font-size:.88rem;color:var(--tx2);line-height:1.65">
+          Submit content to see the <strong style="color:var(--tx)">AI verdict</strong> and confidence score.
+        </div>`;
+
+      renderFlags('');
+      document.getElementById('gaf').style.strokeDashoffset = 282;
+      document.getElementById('gval').textContent           = '—';
+      document.getElementById('gval').style.color           = 'var(--tx3)';
+      document.getElementById('gsub').textContent           = 'No analysis yet';
+    });
+
+    // Load sample button
+    document.getElementById('sampbtn').addEventListener('click', () => {
+      document.getElementById('si').value = `Subject: ⚠️ FINAL WARNING — Account Suspension in 24 Hours\n\nDear Valued Customer,\n\nWe have detected multiple suspicious login attempts on your account. To prevent permanent suspension and avoid legal action, you must verify your identity IMMEDIATELY.\n\n👉 Click here NOW: http://secure-paypal-verify.phishing-domain.net/confirm\n\nYou must enter your password, credit card number, and Social Security Number to confirm ownership.\n\nFailure to act within 24 HOURS will result in:\n• Permanent account termination\n• Legal proceedings against your name  \n• All funds frozen indefinitely\n\nThis is your FINAL WARNING. Act NOW!\n\n— Security Department`;
+      showToast('Sample phishing email loaded!', '📝');
+    });
+
+    // Character counter
+    document.getElementById('si').addEventListener('input', function () {
+      const l = this.value.length;
+      const c = document.getElementById('cc');
+      c.textContent = l + ' / 5000 characters';
+      c.className   = 'ccount' + (l > 4000 ? ' warn' : '');
+      if (l > 5000) this.value = this.value.substring(0, 5000);
+    });
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 10 — FILE UPLOAD (DRAG & DROP)
+       ══════════════════════════════════════════════════════════════ */
+
+    const dzel = document.getElementById('dz');
+    const fiel = document.getElementById('fi');
+
+    dzel.addEventListener('click', () => fiel.click());
+
+    fiel.addEventListener('change', e => {
+      const f = e.target.files[0];
+      if (f) {
+        const r = new FileReader();
+        r.onload = ev => {
+          document.getElementById('si').value = ev.target.result;
+          showToast('File loaded: ' + f.name, '📂');
+        };
+        r.readAsText(f);
+      }
+    });
+
+    ['dragover', 'dragenter'].forEach(ev =>
+      dzel.addEventListener(ev, e => { e.preventDefault(); dzel.classList.add('over'); })
+    );
+    ['dragleave', 'drop'].forEach(ev =>
+      dzel.addEventListener(ev, e => { e.preventDefault(); dzel.classList.remove('over'); })
+    );
+
+    dzel.addEventListener('drop', e => {
+      const f = e.dataTransfer.files[0];
+      if (f) {
+        const r = new FileReader();
+        r.onload = ev => {
+          document.getElementById('si').value = ev.target.result;
+          showToast('Dropped: ' + f.name, '📂');
+        };
+        r.readAsText(f);
+      }
+    });
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 11 — SCAN HISTORY
+       ══════════════════════════════════════════════════════════════ */
+
+    function addHistory(text, phish, conf) {
+      history.unshift({
+        id:   Date.now(),
+        text: text.substring(0, 110),
+        phish,
+        conf: conf.toFixed(1),
+        date: new Date().toLocaleString(),
+      });
+      renderHist();
+    }
+
+    function renderHist(filter = '') {
+      const tb   = document.getElementById('ht');
+      const list = history.filter(h =>
+        h.text.toLowerCase().includes(filter.toLowerCase()) ||
+        (h.phish ? 'phishing' : 'safe').includes(filter.toLowerCase())
+      );
+
+      if (!list.length) {
+        tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--tx3);padding:40px;font-size:.88rem">No scan history yet — analyze a message above 🔎</td></tr>';
+        return;
+      }
+
+      tb.innerHTML = list.map((h, i) => `
+        <tr>
+          <td style="color:var(--tx3);font-family:var(--fm);font-size:.74rem">${i + 1}</td>
+          <td class="tdm">${h.text}</td>
+          <td><span class="vbadge ${h.phish ? 'vbp' : 'vbs'}" style="font-size:.68rem">${h.phish ? '🚨 Phishing' : '✅ Safe'}</span></td>
+          <td style="font-family:var(--fm);font-weight:700;font-size:.88rem;color:${h.phish ? 'var(--red)' : 'var(--grn)'}">${h.conf}%</td>
+          <td style="color:var(--tx3);font-family:var(--fm);font-size:.74rem">${h.date}</td>
+          <td>
+            <div style="display:flex;gap:6px">
+              <button class="ibt del" onclick="delH(${h.id})">🗑</button>
+            </div>
+          </td>
+        </tr>`).join('');
+    }
+
+    window.delH = id => {
+      history = history.filter(h => h.id !== id);
+      renderHist(document.getElementById('hs').value);
+      showToast('Entry removed.', '🗑');
+    };
+
+    document.getElementById('hs').addEventListener('input',  e  => renderHist(e.target.value));
+    document.getElementById('clhb').addEventListener('click', () => { history = []; renderHist(); showToast('History cleared.', '🗑'); });
+
+    document.getElementById('dlb').addEventListener('click', () => {
+      if (!history.length) { showToast('No history to export yet.', '⚠️'); return; }
+      const csv = `#,Message,Verdict,Confidence,Date\n`
+        + history.map((h, i) =>
+            `${i + 1},"${h.text.replace(/"/g, '""')}","${h.phish ? 'Phishing' : 'Safe'}","${h.conf}%","${h.date}"`
+          ).join('\n');
+      const a = document.createElement('a');
+      a.href     = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+      a.download = 'phishguard_report.csv';
+      a.click();
+      showToast('Report exported!', '⬇');
+    });
+
+    renderHist(); // Render initial empty state
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 12 — CHARTS (Chart.js)
+       ══════════════════════════════════════════════════════════════ */
+       function updateDashboard(isPhish, text) {
+
+  // update keyword counts
+  const words = text.toLowerCase().split(/\W+/);
+
+  words.forEach(w => {
+    if (!keywordCounts[w]) keywordCounts[w] = 0;
+    keywordCounts[w]++;
+  });
+
+  // update donut chart
+  pcChart.data.datasets[0].data = [phishingCount, safeCount];
+  pcChart.update();
+
+  // update keyword bar chart
+  const sorted = Object.entries(keywordCounts)
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,10);
+
+  bcChart.data.labels = sorted.map(x=>x[0]);
+  bcChart.data.datasets[0].data = sorted.map(x=>x[1]);
+  bcChart.update();
+}
+let phishingCount = 0;
+let safeCount = 0;
+let keywordCounts = {};
+    Chart.defaults.color       = '#64748b';
+    Chart.defaults.font.family = 'DM Sans, sans-serif';
+    const gc = 'rgba(255,255,255,.04)'; // grid line color
+
+    // Doughnut — detection breakdown
+    const pcChart = new Chart(document.getElementById('pc2'), {
+      type: 'doughnut',
+      data: {
+        labels:   ['Phishing', 'Legitimate'],
+        datasets: [{
+          data:            [34, 66],
+          backgroundColor: ['rgba(239,68,68,.72)', 'rgba(34,197,94,.72)'],
+          borderColor:     ['rgba(239,68,68,.15)', 'rgba(34,197,94,.15)'],
+          borderWidth:     2,
+          hoverOffset:     12,
+        }],
+      },
+      options: {
+        responsive:          true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { padding: 14, font: { size: 11 } } } },
+        cutout:    '68%',
+        animation: { animateRotate: true, duration: 1600 },
+      },
+    });
+
+    // Line — weekly trend
+    new Chart(document.getElementById('lc'), {
+      type: 'line',
+      data: {
+        labels:   ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [
+          {
+            label:            'Phishing',
+            data:             [12, 19, 8, 24, 14, 9, 18],
+            borderColor:      'rgba(239,68,68,.85)',
+            backgroundColor:  'rgba(239,68,68,.07)',
+            borderWidth:      2,
+            fill:             true,
+            tension:          .45,
+            pointBackgroundColor: '#ef4444',
+            pointRadius:      4,
+            pointHoverRadius: 8,
+          },
+          {
+            label:            'Legitimate',
+            data:             [45, 38, 52, 41, 60, 35, 48],
+            borderColor:      'rgba(34,197,94,.85)',
+            backgroundColor:  'rgba(34,197,94,.07)',
+            borderWidth:      2,
+            fill:             true,
+            tension:          .45,
+            pointBackgroundColor: '#22c55e',
+            pointRadius:      4,
+            pointHoverRadius: 8,
+          },
+        ],
+      },
+      options: {
+        responsive:          true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { labels: { font: { size: 11 } } } },
+        scales: {
+          x: { grid: { color: gc }, ticks: { color: '#475569' } },
+          y: { grid: { color: gc }, ticks: { color: '#475569' } },
+        },
+        animation: { duration: 1600 },
+      },
+    });
+
+    // Bar — top keywords
+    const bcChart = new Chart(document.getElementById('bc'), {
+      type: 'bar',
+      data: {
+        labels:   ['urgent','click here','verify','password','suspended','winner','bank','free','confirm','security alert'],
+        datasets: [{
+          label: 'Detections',
+          data:  [87, 73, 68, 62, 55, 48, 45, 41, 38, 34],
+          backgroundColor(ctx) {
+            const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 200);
+            g.addColorStop(0, 'rgba(59,130,246,.85)');
+            g.addColorStop(1, 'rgba(34,197,94,.4)');
+            return g;
+          },
+          borderRadius:  8,
+          borderSkipped: false,
+        }],
+      },
+      options: {
+        responsive:          true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#475569', font: { family: 'JetBrains Mono', size: 10 } } },
+          y: { grid: { color: gc },      ticks: { color: '#475569' } },
+        },
+        animation: { duration: 1800 },
+      },
+    });
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 13 — SECURITY SCORE GAUGE (scroll-triggered)
+       ══════════════════════════════════════════════════════════════ */
+function updateSecurityScore(isPhish) {
+
+  if (isPhish) {
+    awarenessScore -= 5;   // phishing detected → score drops
+  } else {
+    awarenessScore += 2;   // safe detection → score improves
+  }
+
+  // keep score within 0–100
+  awarenessScore = Math.max(0, Math.min(100, awarenessScore));
+
+  // update gauge arc
+  const arc = document.getElementById('bgf');
+  arc.style.strokeDashoffset = 345 - (345 * awarenessScore / 100);
+
+  // update number
+  document.querySelector('.bgval').textContent = awarenessScore;
+
+  // update label text
+  const label = document.querySelector('.bgsubl');
+
+  if (awarenessScore > 80) {
+    label.textContent = "/ 100 · Excellent";
+    arc.style.stroke = "#22c55e";
+  }
+  else if (awarenessScore > 60) {
+    label.textContent = "/ 100 · Good";
+    arc.style.stroke = "#f59e0b";
+  }
+  else {
+    label.textContent = "/ 100 · Risky";
+    arc.style.stroke = "#ef4444";
+  }
+
+}
+    const sobs = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        document.getElementById('bgf').style.strokeDashoffset = 345 - (345 * .78);
+        document.querySelectorAll('.sibf').forEach(b => { b.style.width = b.dataset.w + '%'; });
+        sobs.disconnect();
+      }
+    }, { threshold: .3 });
+
+    const sl = document.querySelector('.slayout');
+    if (sl) sobs.observe(sl);
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 14 — NAV ACTIVE LINK (scroll spy)
+       ══════════════════════════════════════════════════════════════ */
+
+    const nsecs = document.querySelectorAll('section[id]');
+    const nls   = document.querySelectorAll('.nlinks a');
+
+    window.addEventListener('scroll', () => {
+      let cur = '';
+      nsecs.forEach(s => { if (scrollY >= s.offsetTop - 100) cur = s.id; });
+      nls.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+    }, { passive: true });
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 15 — SCROLL REVEAL
+       ══════════════════════════════════════════════════════════════ */
+
+    const ro = new IntersectionObserver(e => {
+      e.forEach(x => {
+        if (x.isIntersecting) { x.target.classList.add('vis'); ro.unobserve(x.target); }
+      });
+    }, { threshold: .08 });
+
+    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+
+    /* ══════════════════════════════════════════════════════════════
+       MODULE 16 — CHATBOT
+       ══════════════════════════════════════════════════════════════ */
+
+    // Open / close
+    document.getElementById('cfab').addEventListener('click', function () {
+      document.getElementById('cbox').classList.toggle('open');
+      this.classList.remove('notif');
+    });
+    document.getElementById('ccls').addEventListener('click', () =>
+      document.getElementById('cbox').classList.remove('open')
+    );
+
+    // Knowledge base
+    const KB = {
+      phishing:  "Phishing is a cyberattack where criminals impersonate trusted entities to steal credentials or install malware. It's the #1 cause of data breaches worldwide.",
+      email:     "Check the full sender email address. Hover all links before clicking. Never download unexpected attachments. Verify unusual requests by calling the sender directly.",
+      url:       "Malicious URLs use typosquatting (paypa1.com), misleading subdomains, or URL shorteners. Always check the full URL. Scan suspicious links at VirusTotal.com first.",
+      password:  "Use a unique strong password for every account. Enable 2-factor authentication everywhere. Legitimate services will NEVER ask for your password via email.",
+      smishing:  "SMS phishing uses fake texts from banks or delivery services. Never click unsolicited SMS links — go directly to official websites by typing the address yourself.",
+      spear:     "Spear phishing is targeted using your name and info from social media. It feels legitimate because it's personalized — that's exactly what makes it dangerous.",
+      bec:       "Business Email Compromise impersonates executives to authorize wire transfers. Always verbally verify unusual financial requests — email authority alone is never sufficient.",
+      safe:      "Best practices: ✓ Verify sender domains ✓ Don't click unsolicited links ✓ Enable 2FA everywhere ✓ Keep software updated ✓ Trust your instincts.",
+      report:    "Report phishing: use your email provider's 'Report Phishing' button, forward to reportphishing@apwg.org, and in India file at cybercrime.gov.in.",
+      help:      "I can answer: 🎣 Phishing | 📧 Email safety | 🔗 URL risks | 🔑 Passwords | 📱 Smishing | 🎯 Spear phishing | 💼 BEC | 🛡️ Best practices | 📢 Reporting",
+    };
+
+    const cbody = document.getElementById('cbody');
+
+    function botReply(msg) {
+      const l = msg.toLowerCase();
+      let r = 'Try asking about: phishing, email safety, URLs, passwords, smishing, or type "help" for all topics! 🛡️';
+      Object.keys(KB).forEach(k => { if (l.includes(k)) r = KB[k]; });
+
+      // Show typing indicator
+      const typ = document.createElement('div');
+      typ.className = 'ctyping';
+      typ.innerHTML = '<div class="typd"></div><div class="typd"></div><div class="typd"></div>';
+      cbody.appendChild(typ);
+      cbody.scrollTop = 9999;
+
+      setTimeout(() => {
+        typ.remove();
+        const d = document.createElement('div');
+        d.className   = 'cm bot';
+        d.textContent = r;
+        cbody.appendChild(d);
+        cbody.scrollTop = 9999;
+      }, 800 + Math.random() * 400);
+    }
+
+    function sendChat() {
+      const inp = document.getElementById('cinp');
+      const msg = inp.value.trim();
+      if (!msg) return;
+
+      const d = document.createElement('div');
+      d.className   = 'cm user';
+      d.textContent = msg;
+      cbody.appendChild(d);
+      cbody.scrollTop = 9999;
+
+      inp.value = '';
+      botReply(msg);
+    }
+
+    // Global helper used by suggestion chip onclick attributes
+    window.askBot = function (msg) {
+      const d = document.createElement('div');
+      d.className   = 'cm user';
+      d.textContent = msg;
+      cbody.appendChild(d);
+      cbody.scrollTop = 9999;
+      botReply(msg);
+      document.getElementById('cbox').classList.add('open');
+    };
+
+    document.getElementById('csnd').addEventListener('click', sendChat);
+    document.getElementById('cinp').addEventListener('keydown', e => { if (e.key === 'Enter') sendChat(); });
+
+  </script>
+
+</body>
+</html>
